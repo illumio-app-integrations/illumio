@@ -360,7 +360,6 @@ def main():
 
         # User specified a username but not a password, so ask
         import getpass
-
         password = getpass.getpass("Password: ")
 
     if username and password:
