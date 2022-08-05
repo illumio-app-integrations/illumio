@@ -27,7 +27,7 @@ from phantom.base_connector import BaseConnector
 
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
+from illumio_consts import *
 import requests
 import json
 import illumio
@@ -39,14 +39,10 @@ from illumio.exceptions import IllumioException
 
 
 class IllumioConnector(BaseConnector):
-    """
-    Represent a connector module that implements the actions that are provided by the app.
-
-    IllumioConnector is a class that is derived from the BaseConnector class.
-    """
+    """Represent a connector module that implements the actions that are provided by the app."""
 
     def __init__(self):
-        """Initialize global variables."""
+        """Initialize class variables."""
         # Call the BaseConnectors init first
         super(IllumioConnector, self).__init__()
 
@@ -56,12 +52,13 @@ class IllumioConnector(BaseConnector):
         self._hostname = None
         self._port = None
         self._org_id = None
+        self._pce = None
 
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("Connecting to PCE")
 
-        if self.connect_pce():
+        if self.connect_pce(action_result):
             self.save_progress("Connectivity Test Passed")
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
@@ -91,28 +88,26 @@ class IllumioConnector(BaseConnector):
                 "The 'end_time' parameter must be greater than 'start_time' parameter",
             )
 
-        port = self._validate_integers(self, param["port"], "port")
-        if self._port is None:
-            return self.get_status()
+        ret_val, port = self._validate_integers(action_result, param["port"], "port")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if port <= 0 or port >= 65536:
+        if port >= 65536:
             return action_result.set_status(
                 phantom.APP_ERROR, "Please enter a valid value for 'port' parameter"
             )
 
         protocol = param["protocol"].lower()
-        if protocol not in ["tcp", "udp"]:
+        if protocol not in PROTOCOL_LIST:
             return action_result.set_status(
                 phantom.APP_ERROR, "Please enter a valid value for 'protocol' parameter"
             )
 
         policy_decisions_string = param["policy_decisions"].lower()
 
-        pce = self.connect_pce()
-        if not pce:
-            return action_result.set_status(
-                phantom.APP_ERROR, "Failed to connect to PCE"
-            )
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             policy_decisions_list = [
@@ -127,24 +122,25 @@ class IllumioConnector(BaseConnector):
                 policy_decisions=policy_decisions_list,
             )
 
-            traffic_flow_list = pce.get_traffic_flows_async(
+            traffic_flow_list = self._pce.get_traffic_flows_async(
                 query_name="phantom_block_port_traffic_query",
                 traffic_query=traffic_query,
             )
 
         except IllumioException as e:
             return action_result.set_status(
-                phantom.APP_ERROR, f"Encountered error while running traffic query: {e}"
+                phantom.APP_ERROR,
+                "Encountered error while running traffic query: {}".format(e),
             )
 
         traffic_list_length = len(traffic_flow_list)
 
         self.debug_print(
-            f"Found {traffic_list_length} records for the specified time range"
+            "Found {} records for the specified time range".format(traffic_list_length)
         )
 
         result = {
-            "traffic_flow": [
+            "traffic_flows": [
                 self.convert_object_to_json(flow) for flow in traffic_flow_list
             ]
         }
@@ -158,9 +154,7 @@ class IllumioConnector(BaseConnector):
         )
 
     def handle_action(self, param):
-        """
-        Get current action identifier and call member function of its own to handle the action.
-        """
+        """Get current action identifier and call member function of its own to handle the action."""
         ret_val = phantom.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
@@ -190,19 +184,21 @@ class IllumioConnector(BaseConnector):
         self._api_secret = config["api_secret"]
         self._hostname = config["hostname"]
 
-        self._port = self._validate_integers(self, config["port"], "port")
-        if self._port is None:
+        ret_val, self._port = self._validate_integers(self, config["port"], "port")
+        if phantom.is_fail(ret_val):
             return self.get_status()
 
-        self._org_id = self._validate_integers(self, config["org_id"], "org_id")
-        if self._org_id is None:
+        ret_val, self._org_id = self._validate_integers(
+            self, config["org_id"], "org_id"
+        )
+        if phantom.is_fail(ret_val):
             return self.get_status()
 
         return phantom.APP_SUCCESS
 
     def check_for_future_datetime(self, datetime_obj):
         """
-        Checks the given datetime str isa future date or not
+        Checks the given datetime str is a future date or not.
 
         :param datetime_obj: datetime object
         :return : bool
@@ -211,7 +207,7 @@ class IllumioConnector(BaseConnector):
 
     def convert_to_iso(self, dt_str, action_result, key):
         """
-        Converst input date to iso8601 datetime
+        Converts input date to iso8601 datetime.
 
         :param dt_str: datetime string
         :param action_result: action result object
@@ -222,11 +218,14 @@ class IllumioConnector(BaseConnector):
             date_time = parse(dt_str)
             if not date_time.tzinfo:
                 date_time = date_time.replace(tzinfo=pytz.utc)
+            date_time = date_time.astimezone(pytz.utc)
             if self.check_for_future_datetime(date_time):
                 return (
                     action_result.set_status(
                         phantom.APP_ERROR,
-                        f"Please provide a valid value for parameter '{key}'",
+                        "The provided time is a future datetime. Please provide a valid value for parameter '{}'".format(
+                            key
+                        ),
                     ),
                     None,
                 )
@@ -234,7 +233,7 @@ class IllumioConnector(BaseConnector):
         except Exception:
             return (
                 action_result.set_status(
-                    phantom.APP_ERROR, f"Parameter '{key}' is invalid"
+                    phantom.APP_ERROR, "Parameter '{}' is invalid".format(key)
                 ),
                 None,
             )
@@ -242,7 +241,7 @@ class IllumioConnector(BaseConnector):
 
     def check_starttime_greater_than_endtime(self, datetime_start, datetime_end):
         """
-        Checks if starttime is greater than endtime or not
+        Checks if starttime is greater than endtime or not.
 
         :param datetime_start: start datetime obj
         :param datetime_end: end datetime obj
@@ -250,48 +249,52 @@ class IllumioConnector(BaseConnector):
         """
         return datetime_start > datetime_end
 
-    def connect_pce(self):
+    def connect_pce(self, action_result):
         """
-        Connects to the PCE server
+        Connects to the PCE server.
 
         :return: pce obj value
         """
         try:
-            pce = illumio.PolicyComputeEngine(
+            self._pce = illumio.PolicyComputeEngine(
                 self._hostname, port=str(self._port), org_id=str(self._org_id)
             )
-            pce.set_credentials(self._api_key, self._api_secret)
-            test_connection = pce.check_connection()
+            self._pce.set_credentials(self._api_key, self._api_secret)
+            test_connection = self._pce.check_connection()
 
         except IllumioException as e:
-            self.set_status(
-                phantom.APP_ERROR, f"Encountered error while conecting to PCE: {e}"
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error while conecting to PCE: {}".format(e),
             )
-            return None
 
-        return pce if test_connection else None
+        return (
+            phantom.APP_SUCCESS
+            if test_connection
+            else action_result.set_status(phantom.APP_ERROR, "Failed to connect to PCE")
+        )
 
     def convert_object_to_json(self, obj):
         """
-        Converts result object to json
+        Converts result object to json.
 
         :param obj: result object
         :return : json
         """
 
         try:
-            json_data = json.loads(json.dumps(obj, cls=illumio.util.IllumioEncoder))
-        except IllumioException as e:
+            json_data = obj.to_json()
+        except Exception as e:
             self.set_status(
-                phantom.APP_ERROR, f"Encountered error while processing response: {e}"
+                phantom.APP_ERROR,
+                "Encountered error while processing response: {}".format(e),
             )
             return {}
         return json_data
 
     def _validate_integers(self, action_result, parameter, key, allow_zero=False):
         """
-        Checks if the provided input parameter value
-        is a non-zero positive integer and returns the integer value of the parameter itself.
+        Checks if the provided input parameter value is a non-zero positive integer and returns the integer value of the parameter itself.
 
         :param action_result: Action result or BaseConnector object
         :param parameter: input parameter
@@ -303,36 +306,50 @@ class IllumioConnector(BaseConnector):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        f"Please provide a valid integer value in the {key} parameter",
+                    return (
+                        action_result.set_status(
+                            phantom.APP_ERROR,
+                            "Please provide a valid integer value in the {} parameter".format(
+                                key
+                            ),
+                        ),
+                        None,
                     )
-                    return None
                 parameter = int(parameter)
 
             except Exception:
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    f"Please provide a valid integer value in the {key} parameter",
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR,
+                        "Please provide a valid integer value in the {} parameter".format(
+                            key
+                        ),
+                    ),
+                    None,
                 )
-                return None
 
             if parameter < 0:
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    f"Please provide a valid non-negative integer value in the {key} parameter",
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR,
+                        "Please provide a valid non-negative integer value in the {} parameter".format(
+                            key
+                        ),
+                    ),
+                    None,
                 )
-
-                return None
             if not allow_zero and parameter == 0:
-                action_result.set_status(
-                    phantom.APP_ERROR,
-                    f"Please provide a positive integer value in the {key} parameter",
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR,
+                        "Please provide a positive integer value in the {} parameter".format(
+                            key
+                        ),
+                    ),
+                    None,
                 )
 
-                return None
-
-        return parameter
+        return phantom.APP_SUCCESS, parameter
 
     def finalize(self):
         """Perform some final operations or clean up operations."""
@@ -360,6 +377,7 @@ def main():
 
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if username and password:

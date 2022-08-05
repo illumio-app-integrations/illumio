@@ -67,7 +67,7 @@
             "action": "get traffic analysis",
             "identifier": "get_traffic_analysis",
             "description": "List of traffic on specified port",
-            "verbose": "The end_time will be the current time if a user provides no input and the start_time will be 5 years back from end_time if the user provides no input. Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked.",
+            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked.",
             "type": "investigative",
             "read_only": true,
             "parameters": {
@@ -109,7 +109,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.ip",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.ip",
                     "data_type": "string",
                     "example_values": [
                         "13.234.176.102"
@@ -118,7 +118,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.ip",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.ip",
                     "data_type": "string",
                     "example_values": [
                         "10.50.4.153"
@@ -127,56 +127,56 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.workload.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.href",
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.workload.name",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.name",
                     "data_type": "string",
                     "example_values": [
                         "workload-localhost.localdomain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.workload.os_type",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.os_type",
                     "data_type": "string",
                     "example_values": [
                         "linux"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.workload.hostname",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.hostname",
                     "data_type": "string",
                     "example_values": [
                         "localhost.localdomain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.state",
+                    "data_path": "action_result.data.*.traffic_flows.*.state",
                     "data_type": "string",
                     "example_values": [
                         "timed out"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst_bi",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst_bi",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst_bo",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst_bo",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.service.port",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.port",
                     "data_type": "numeric",
                     "example_values": [
                         22
@@ -185,7 +185,7 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.service.proto",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.proto",
                     "data_type": "numeric",
                     "example_values": [
                         6
@@ -194,91 +194,91 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.service.user_name",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.user_name",
                     "data_type": "string",
                     "example_values": [
                         "devuser"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.flow_direction",
+                    "data_path": "action_result.data.*.traffic_flows.*.flow_direction",
                     "data_type": "string",
                     "example_values": [
                         "outbound"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.num_connections",
+                    "data_path": "action_result.data.*.traffic_flows.*.num_connections",
                     "data_type": "numeric",
                     "example_values": [
                         1
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.policy_decision",
+                    "data_path": "action_result.data.*.traffic_flows.*.policy_decision",
                     "data_type": "string",
                     "example_values": [
                         "potentially_blocked"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.timestamp_range.last_detected",
+                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.last_detected",
                     "data_type": "string",
                     "example_values": [
                         "2022-07-28T09:07:55Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.timestamp_range.first_detected",
+                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.first_detected",
                     "data_type": "string",
                     "example_values": [
                         "2022-07-28T09:07:55Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.workload.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.href",
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.workload.name",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.name",
                     "data_type": "string",
                     "example_values": [
                         "workload-localhost.localdomain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.workload.os_type",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.os_type",
                     "data_type": "string",
                     "example_values": [
                         "linux"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.workload.hostname",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.hostname",
                     "data_type": "string",
                     "example_values": [
                         "localhost.localdomain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.service.process_name",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.process_name",
                     "data_type": "string",
                     "example_values": [
                         "sshd"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.virtual_service.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.href",
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/virtual_services/16ab3e56-7cb8-438e-a580-89d55632dae4"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.virtual_service.name",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.name",
                     "data_type": "string",
                     "example_values": [
                         "Virtual-service-22"
@@ -287,21 +287,21 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.ip_lists.*.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.ip_lists.*.href",
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/ip_lists/966"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.src.ip_lists.*.name",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.ip_lists.*.name",
                     "data_type": "string",
                     "example_values": [
                         "test-iplist"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flow.*.dst.workload.labels.*.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.labels.*.href",
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/labels/1240"
