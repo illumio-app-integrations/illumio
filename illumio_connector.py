@@ -88,14 +88,11 @@ class IllumioConnector(BaseConnector):
                 "The 'end_time' parameter must be greater than 'start_time' parameter",
             )
 
-        ret_val, port = self._validate_integers(action_result, param["port"], "port")
+        ret_val, port = self._validate_integers(
+            action_result, param["port"], "port", max_value=PORT_MAX_VALUE
+        )
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        if port >= 65536:
-            return action_result.set_status(
-                phantom.APP_ERROR, "Please enter a valid value for 'port' parameter"
-            )
 
         protocol = param["protocol"].lower()
         if protocol not in PROTOCOL_LIST:
@@ -292,7 +289,9 @@ class IllumioConnector(BaseConnector):
             return {}
         return json_data
 
-    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
+    def _validate_integers(
+        self, action_result, parameter, key, allow_zero=False, max_value=None
+    ):
         """
         Checks if the provided input parameter value is a non-zero positive integer and returns the integer value of the parameter itself.
 
@@ -327,6 +326,18 @@ class IllumioConnector(BaseConnector):
                     ),
                     None,
                 )
+
+            if max_value:
+                if parameter > max_value:
+                    return (
+                        action_result.set_status(
+                            phantom.APP_ERROR,
+                            "Please provide a valid integer value in the {} parameter less than {}".format(
+                                key, max_value
+                            ),
+                        ),
+                        None,
+                    )
 
             if parameter < 0:
                 return (

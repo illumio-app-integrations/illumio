@@ -21,3 +21,5 @@
 # and limitations under the License.
 
 PROTOCOL_LIST = ["tcp", "udp"]
+ENFORCEMENT_MODE_LIST = ["idle", "visibility_only", "full", "selective"]
+PORT_MAX_VALUE = 65536
