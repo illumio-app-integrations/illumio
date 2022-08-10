@@ -28,6 +28,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 from illumio_consts import *
+import sys
 import requests
 import json
 import illumio
@@ -68,14 +69,14 @@ class IllumioConnector(BaseConnector):
     def _handle_get_traffic_analysis(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, end_time = self.convert_to_iso(
+        ret_val, end_time = self.parse_and_validate_date(
             param["end_time"], action_result, "end_time"
         )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val, start_time = self.convert_to_iso(
+        ret_val, start_time = self.parse_and_validate_date(
             param["start_time"], action_result, "start_time"
         )
 
@@ -88,8 +89,8 @@ class IllumioConnector(BaseConnector):
                 "The 'end_time' parameter must be greater than 'start_time' parameter",
             )
 
-        ret_val, port = self._validate_integers(
-            action_result, param["port"], "port", max_value=PORT_MAX_VALUE
+        ret_val, port = self._validate_integer(
+            action_result, param["port"], "port", max=PORT_MAX_VALUE
         )
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -138,7 +139,8 @@ class IllumioConnector(BaseConnector):
 
         result = {
             "traffic_flows": [
-                self.convert_object_to_json(flow) for flow in traffic_flow_list
+                self.convert_object_to_json(flow, action_result)
+                for flow in traffic_flow_list
             ]
         }
         action_result.add_data(result)
@@ -181,12 +183,14 @@ class IllumioConnector(BaseConnector):
         self._api_secret = config["api_secret"]
         self._hostname = config["hostname"]
 
-        ret_val, self._port = self._validate_integers(self, config["port"], "port")
+        ret_val, self._port = self._validate_integer(
+            self, config["port"], "port", max=PORT_MAX_VALUE
+        )
         if phantom.is_fail(ret_val):
             return self.get_status()
 
-        ret_val, self._org_id = self._validate_integers(
-            self, config["org_id"], "org_id"
+        ret_val, self._org_id = self._validate_integer(
+            self, config["org_id"], "org_id", min=1
         )
         if phantom.is_fail(ret_val):
             return self.get_status()
@@ -202,7 +206,7 @@ class IllumioConnector(BaseConnector):
         """
         return datetime_obj > datetime.now(tz=pytz.utc)
 
-    def convert_to_iso(self, dt_str, action_result, key):
+    def parse_and_validate_date(self, dt_str, action_result, key):
         """
         Converts input date to iso8601 datetime.
 
@@ -271,7 +275,7 @@ class IllumioConnector(BaseConnector):
             else action_result.set_status(phantom.APP_ERROR, "Failed to connect to PCE")
         )
 
-    def convert_object_to_json(self, obj):
+    def convert_object_to_json(self, obj, action_result):
         """
         Converts result object to json.
 
@@ -282,85 +286,39 @@ class IllumioConnector(BaseConnector):
         try:
             json_data = obj.to_json()
         except Exception as e:
-            self.set_status(
+            action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error while processing response: {}".format(e),
             )
             return {}
         return json_data
 
-    def _validate_integers(
-        self, action_result, parameter, key, allow_zero=False, max_value=None
-    ):
+    def _validate_integer(self, action_result, parameter, key, min=0, max=sys.maxsize):
         """
-        Checks if the provided input parameter value is a non-zero positive integer and returns the integer value of the parameter itself.
+        Checks if the provided input parameter value is a integer and returns the integer value of the parameter itself.
 
         :param action_result: Action result or BaseConnector object
         :param parameter: input parameter
         :param key: input parameter message key
-        :param allow_zero: whether zero should be considered valid value or not
+        :param min: minimum allowed integer value
+        :param max: maximum allowed integer value
         :return: integer value of the parameter or None in case of failure
         """
-
+        error_message = (
+            "Please provide a valid integer value for the '{}' parameter".format(key)
+        )
         if parameter is not None:
             try:
-                if not float(parameter).is_integer():
-                    return (
-                        action_result.set_status(
-                            phantom.APP_ERROR,
-                            "Please provide a valid integer value in the {} parameter".format(
-                                key
-                            ),
-                        ),
-                        None,
-                    )
                 parameter = int(parameter)
-
-            except Exception:
-                return (
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        "Please provide a valid integer value in the {} parameter".format(
-                            key
-                        ),
-                    ),
-                    None,
-                )
-
-            if max_value:
-                if parameter > max_value:
-                    return (
-                        action_result.set_status(
-                            phantom.APP_ERROR,
-                            "Please provide a valid integer value in the {} parameter less than {}".format(
-                                key, max_value
-                            ),
-                        ),
-                        None,
+                if min <= parameter <= max:
+                    return phantom.APP_SUCCESS, parameter
+                else:
+                    error_message = "Invalid integer value for parameter {}: please enter value between {} and {}".format(
+                        key, min, max
                     )
-
-            if parameter < 0:
-                return (
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        "Please provide a valid non-negative integer value in the {} parameter".format(
-                            key
-                        ),
-                    ),
-                    None,
-                )
-            if not allow_zero and parameter == 0:
-                return (
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        "Please provide a positive integer value in the {} parameter".format(
-                            key
-                        ),
-                    ),
-                    None,
-                )
-
-        return phantom.APP_SUCCESS, parameter
+            except Exception:
+                pass  # fall through to the default failure response
+        return action_result.set_status(phantom.APP_ERROR, error_message), None
 
     def finalize(self):
         """Perform some final operations or clean up operations."""

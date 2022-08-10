@@ -67,7 +67,7 @@
             "action": "get traffic analysis",
             "identifier": "get_traffic_analysis",
             "description": "List of traffic on specified port",
-            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss",
+            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss. Supported timezone offset format for parameters 'start_time' and 'end_time' are Z(UTC), ±HH:MM, ±HHMM and ±HH.",
             "type": "investigative",
             "read_only": true,
             "parameters": {
