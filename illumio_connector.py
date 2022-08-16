@@ -108,10 +108,9 @@ class IllumioConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            policy_decisions_list = [
-                x.strip() for x in policy_decisions_string.split(",")
-            ]
-            policy_decisions_list = list(filter(None, policy_decisions_list))
+            policy_decisions_list = self.handle_comma_seperated_string(
+                policy_decisions_string
+            )
 
             traffic_query = illumio.TrafficQuery.build(
                 start_date=start_time.isoformat(),
@@ -152,6 +151,286 @@ class IllumioConnector(BaseConnector):
             phantom.APP_SUCCESS, "Successfully fetched traffic flow list"
         )
 
+    def _handle_create_virtual_service(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, port = self._validate_integer(
+            action_result, param["port"], "port", max=PORT_MAX_VALUE
+        )
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+
+        protocol = param["protocol"].lower()
+        if protocol not in PROTOCOL_LIST:
+            return action_result.set_status(
+                phantom.APP_ERROR, ILLUMIO_INVALID_PROTOCOL_MSG
+            )
+
+        service_name = param["name"]
+        virtual_service = None
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            service_list = self._pce.virtual_services.get(
+                params={"name": "{}".format(service_name)}
+            )
+            for service in service_list:
+                if service_name == service.name:
+                    virtual_service = service
+                    action_result.set_status(
+                        phantom.APP_SUCCESS,
+                        "Found existing virtual service with name {}".format(
+                            service_name
+                        ),
+                    )
+                    break
+
+            if not virtual_service:
+                virtual_service = illumio.VirtualService(
+                    name=service_name,
+                    service_ports=[illumio.ServicePort(port=port, proto=protocol)],
+                )
+                virtual_service = self._pce.virtual_services.create(virtual_service)
+                action_result.set_status(
+                    phantom.APP_SUCCESS, "Successfully created virtual service"
+                )
+
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error creating virtual service: {}".format(e),
+            )
+
+        result = self.convert_object_to_json(virtual_service, action_result)
+        action_result.add_data(result)
+        return action_result.get_status()
+
+    def _handle_provision_objects(self, param):
+        hrefs = param["hrefs"]
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            hrefs_list = self.handle_comma_seperated_string(hrefs)
+
+            provisioned_virtual_service_obj = self._pce.provision_policy_changes(
+                change_description="Phantom object provisioning.",
+                hrefs=hrefs_list,
+            )
+
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error provisioning object: {}".format(e),
+            )
+
+        result = self.convert_object_to_json(
+            provisioned_virtual_service_obj, action_result
+        )
+        action_result.add_data(result)
+        return action_result.set_status(
+            phantom.APP_SUCCESS, "Successfully provisioned object"
+        )
+
+    def _handle_get_ip_lists(self, param):
+        name = param["name"]
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ip_list_data = None
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            ip_list = self._pce.ip_lists.get(
+                policy_version="active", params={"name": name}
+            )
+            for data in ip_list:
+                if name == data.name:
+                    ip_list_data = data
+                    action_result.set_status(
+                        phantom.APP_SUCCESS, "Successfully fetched IP List"
+                    )
+                    break
+            if not ip_list_data:
+                ip_list_data = {}
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    "IP List with name '{}' does not exist".format(name),
+                )
+
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error fetching IP List: {}".format(e),
+            )
+
+        result = self.convert_object_to_json(ip_list_data, action_result)
+        action_result.add_data(result)
+        return action_result.get_status()
+
+    def _handle_create_ruleset(self, param):
+        name = param["name"]
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        rule_set = None
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            ruleset_list = self._pce.rule_sets.get(params={"name": name})
+            for ruleset in ruleset_list:
+                if name == ruleset.name:
+                    rule_set = ruleset
+                    action_result.set_status(
+                        phantom.APP_SUCCESS,
+                        "Found existing ruleset with name {}".format(name),
+                    )
+                    break
+
+            if not rule_set:
+                rule_set = illumio.RuleSet(
+                    name=name, scopes=[illumio.LabelSet(labels=[])]
+                )
+                rule_set = self._pce.rule_sets.create(rule_set)
+                action_result.set_status(
+                    phantom.APP_SUCCESS, "Successfully created ruleset"
+                )
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error creating ruleset: {}".format(e),
+            )
+
+        result = self.convert_object_to_json(rule_set, action_result)
+        action_result.add_data(result)
+        return action_result.get_status()
+
+    def handle_comma_seperated_string(self, comma_str):
+        """
+        Convert comma seperated string into list.
+
+        :param comma_str: comma seperated string
+        :return : list
+        """
+        str_to_list = [x.strip() for x in comma_str.split(",")]
+        str_to_list = list(filter(None, str_to_list))
+        return str_to_list
+
+    def _handle_create_rule(self, param):
+        providers_list = self.handle_comma_seperated_string(param["providers"])
+        consumers_list = self.handle_comma_seperated_string(param["consumers"])
+        ruleset_href = param["ruleset_href"]
+        resolve_consumers_as_list = self.handle_comma_seperated_string(
+            param["resolve_consumers_as"]
+        )
+        resolve_providers_as_list = self.handle_comma_seperated_string(
+            param["resolve_providers_as"]
+        )
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            rule = illumio.Rule.build(
+                providers=providers_list,
+                consumers=consumers_list,
+                resolve_providers_as=resolve_providers_as_list,
+                resolve_consumers_as=resolve_consumers_as_list,
+                ingress_services=[],
+            )
+            rule = self._pce.rules.create(rule, parent=ruleset_href)
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error creating rule: {}".format(e),
+            )
+
+        result = self.convert_object_to_json(rule, action_result)
+        action_result.add_data(result)
+        return action_result.set_status(
+            phantom.APP_SUCCESS, "Successfully created rule"
+        )
+
+    def _handle_create_service_binding(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        workload_hrefs_list = self.handle_comma_seperated_string(
+            param["workload_hrefs"]
+        )
+        virtual_service_href = param["virtual_service_href"]
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            service_binding_list_for_virtual_service = self._pce.service_bindings.get(
+                params={"virtual_service": virtual_service_href}
+            )
+            bounded_workload_with_virtual_service_list = [
+                service_binding.to_json()["workload"]["href"]
+                for service_binding in service_binding_list_for_virtual_service
+            ]
+
+            for workload in bounded_workload_with_virtual_service_list:
+                if workload in workload_hrefs_list:
+                    workload_hrefs_list.remove(workload)
+
+            if not workload_hrefs_list:
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Workloads already bounded"
+                )
+
+            service_bindings = self._pce.service_bindings.create(
+                [
+                    {
+                        "workload": {"href": workload_href},
+                        "virtual_service": {"href": virtual_service_href},
+                        "port_overrides": [],
+                    }
+                    for workload_href in workload_hrefs_list
+                ]
+            )
+            self.debug_print(service_bindings)
+            if len(service_bindings["service_bindings"]) == len(workload_hrefs_list):
+                action_result.set_status(
+                    phantom.APP_SUCCESS,
+                    "Successfully bound workload with virtual service.",
+                )
+
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error creating service binding: {}".format(e),
+            )
+
+        if service_bindings["service_bindings"]:
+            temp_list = []
+            for obj in service_bindings["service_bindings"]:
+                temp_list.append(obj.to_json())
+            service_bindings["service_bindings"] = temp_list
+
+        result = service_bindings
+        action_result.add_data(result)
+        return action_result.get_status()
+
     def handle_action(self, param):
         """Get current action identifier and call member function of its own to handle the action."""
         ret_val = phantom.APP_SUCCESS
@@ -165,6 +444,18 @@ class IllumioConnector(BaseConnector):
             ret_val = self._handle_test_connectivity(param)
         elif action_id == "get_traffic_analysis":
             ret_val = self._handle_get_traffic_analysis(param)
+        elif action_id == "create_virtual_service":
+            ret_val = self._handle_create_virtual_service(param)
+        elif action_id == "provision_objects":
+            ret_val = self._handle_provision_objects(param)
+        elif action_id == "get_ip_lists":
+            ret_val = self._handle_get_ip_lists(param)
+        elif action_id == "create_ruleset":
+            ret_val = self._handle_create_ruleset(param)
+        elif action_id == "create_rule":
+            ret_val = self._handle_create_rule(param)
+        elif action_id == "create_service_binding":
+            ret_val = self._handle_create_service_binding(param)
 
         return ret_val
 
