@@ -261,8 +261,7 @@ class IllumioConnector(BaseConnector):
                     )
                     break
             if not ip_list_data:
-                ip_list_data = {}
-                action_result.set_status(
+                return action_result.set_status(
                     phantom.APP_ERROR,
                     "IP List with name '{}' does not exist".format(name),
                 )
