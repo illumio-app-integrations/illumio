@@ -23,3 +23,5 @@
 PROTOCOL_LIST = ["tcp", "udp"]
 ENFORCEMENT_MODE_LIST = ["idle", "visibility_only", "full", "selective"]
 PORT_MAX_VALUE = 65535
+ILLUMIO_EXISTING_RULE_SET_MSG = "rule_set_name_in_use"
+ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG = "name_must_be_unique"

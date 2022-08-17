@@ -175,35 +175,35 @@ class IllumioConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            service_list = self._pce.virtual_services.get(
-                params={"name": "{}".format(service_name)}
+            virtual_service = illumio.VirtualService(
+                name=service_name,
+                service_ports=[illumio.ServicePort(port=port, proto=protocol)],
             )
-            for service in service_list:
-                if service_name == service.name:
-                    virtual_service = service
-                    action_result.set_status(
-                        phantom.APP_SUCCESS,
-                        "Found existing virtual service with name {}".format(
-                            service_name
-                        ),
-                    )
-                    break
-
-            if not virtual_service:
-                virtual_service = illumio.VirtualService(
-                    name=service_name,
-                    service_ports=[illumio.ServicePort(port=port, proto=protocol)],
-                )
-                virtual_service = self._pce.virtual_services.create(virtual_service)
-                action_result.set_status(
-                    phantom.APP_SUCCESS, "Successfully created virtual service"
-                )
+            virtual_service = self._pce.virtual_services.create(virtual_service)
+            action_result.set_status(
+                phantom.APP_SUCCESS, "Successfully created virtual service"
+            )
 
         except IllumioException as e:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Encountered error creating virtual service: {}".format(e),
-            )
+            if ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG in e:
+                service_list = self._pce.virtual_services.get(
+                    params={"name": service_name}
+                )
+                for service in service_list:
+                    if service_name == service.name:
+                        virtual_service = service
+                        action_result.set_status(
+                            phantom.APP_SUCCESS,
+                            "Found existing virtual service with name {}".format(
+                                service_name
+                            ),
+                        )
+                        break
+            else:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Encountered error creating virtual service: {}".format(e),
+                )
 
         result = self.convert_object_to_json(virtual_service, action_result)
         action_result.add_data(result)
@@ -252,9 +252,7 @@ class IllumioConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            ip_list = self._pce.ip_lists.get(
-                policy_version="active", params={"name": name}
-            )
+            ip_list = self._pce.ip_lists.get(params={"name": name})
             for data in ip_list:
                 if name == data.name:
                     ip_list_data = data
@@ -291,29 +289,28 @@ class IllumioConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            ruleset_list = self._pce.rule_sets.get(params={"name": name})
-            for ruleset in ruleset_list:
-                if name == ruleset.name:
-                    rule_set = ruleset
-                    action_result.set_status(
-                        phantom.APP_SUCCESS,
-                        "Found existing ruleset with name {}".format(name),
-                    )
-                    break
-
-            if not rule_set:
-                rule_set = illumio.RuleSet(
-                    name=name, scopes=[illumio.LabelSet(labels=[])]
-                )
-                rule_set = self._pce.rule_sets.create(rule_set)
-                action_result.set_status(
-                    phantom.APP_SUCCESS, "Successfully created ruleset"
-                )
-        except IllumioException as e:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Encountered error creating ruleset: {}".format(e),
+            rule_set = illumio.RuleSet(name=name, scopes=[illumio.LabelSet(labels=[])])
+            rule_set = self._pce.rule_sets.create(rule_set)
+            action_result.set_status(
+                phantom.APP_SUCCESS, "Successfully created ruleset"
             )
+        except IllumioException as e:
+            if ILLUMIO_EXISTING_RULE_SET_MSG in e:
+                ruleset_list = self._pce.rule_sets.get(params={"name": name})
+                for ruleset in ruleset_list:
+                    if name == ruleset.name:
+                        rule_set = ruleset
+                        action_result.set_status(
+                            phantom.APP_SUCCESS,
+                            "Found existing ruleset with name {}".format(name),
+                        )
+                        break
+
+            else:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Encountered error creating ruleset: {}".format(e),
+                )
 
         result = self.convert_object_to_json(rule_set, action_result)
         action_result.add_data(result)
@@ -326,8 +323,7 @@ class IllumioConnector(BaseConnector):
         :param comma_str: comma seperated string
         :return : list
         """
-        str_to_list = [x.strip() for x in comma_str.split(",")]
-        str_to_list = list(filter(None, str_to_list))
+        str_to_list = [x.strip() for x in comma_str.split(",") if x]
         return str_to_list
 
     def _handle_create_rule(self, param):
@@ -374,6 +370,7 @@ class IllumioConnector(BaseConnector):
         workload_hrefs_list = self.handle_comma_seperated_string(
             param["workload_hrefs"]
         )
+        len_workload_list = len(workload_hrefs_list)
         virtual_service_href = param["virtual_service_href"]
 
         ret_val = self.connect_pce(action_result)
@@ -381,23 +378,6 @@ class IllumioConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            service_binding_list_for_virtual_service = self._pce.service_bindings.get(
-                params={"virtual_service": virtual_service_href}
-            )
-            bounded_workload_with_virtual_service_list = [
-                service_binding.to_json()["workload"]["href"]
-                for service_binding in service_binding_list_for_virtual_service
-            ]
-
-            for workload in bounded_workload_with_virtual_service_list:
-                if workload in workload_hrefs_list:
-                    workload_hrefs_list.remove(workload)
-
-            if not workload_hrefs_list:
-                return action_result.set_status(
-                    phantom.APP_ERROR, "Workloads already bounded"
-                )
-
             service_bindings = self._pce.service_bindings.create(
                 [
                     {
@@ -408,11 +388,41 @@ class IllumioConnector(BaseConnector):
                     for workload_href in workload_hrefs_list
                 ]
             )
-            self.debug_print(service_bindings)
-            if len(service_bindings["service_bindings"]) == len(workload_hrefs_list):
+
+            service_binding_list_for_virtual_service = self._pce.service_bindings.get(
+                params={"virtual_service": virtual_service_href}
+            )
+            bounded_workload_with_virtual_service_list = [
+                service_binding.workload.href
+                for service_binding in service_binding_list_for_virtual_service
+            ]
+
+            for workload in bounded_workload_with_virtual_service_list:
+                if workload in workload_hrefs_list:
+                    workload_hrefs_list.remove(workload)
+
+            if workload_hrefs_list:
+                err_msg = "Unable to bind following workloads: {}".format(
+                    workload_hrefs_list
+                )
                 action_result.set_status(
                     phantom.APP_SUCCESS,
-                    "Successfully bound workload with virtual service.",
+                    "Successfully bound {} workload with virtual service. {}".format(
+                        len_workload_list - len(workload_hrefs_list), err_msg
+                    ),
+                )
+
+            else:
+                action_result.set_status(
+                    phantom.APP_SUCCESS,
+                    "Successfully bound {} workload with virtual service".format(
+                        len_workload_list
+                    ),
+                )
+
+            if not service_bindings["service_bindings"] and not workload_hrefs_list:
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Workloads already bounded"
                 )
 
         except IllumioException as e:
@@ -421,14 +431,11 @@ class IllumioConnector(BaseConnector):
                 "Encountered error creating service binding: {}".format(e),
             )
 
-        if service_bindings["service_bindings"]:
-            temp_list = []
-            for obj in service_bindings["service_bindings"]:
-                temp_list.append(obj.to_json())
-            service_bindings["service_bindings"] = temp_list
+        service_bindings["service_bindings"] = [
+            sb.to_json() for sb in service_bindings["service_bindings"]
+        ]
 
-        result = service_bindings
-        action_result.add_data(result)
+        action_result.add_data(service_bindings)
         return action_result.get_status()
 
     def handle_action(self, param):
@@ -490,7 +497,7 @@ class IllumioConnector(BaseConnector):
 
     def check_for_future_datetime(self, datetime_obj):
         """
-        Checks the given datetime str is a future date or not.
+        Check the given datetime str is a future date or not.
 
         :param datetime_obj: datetime object
         :return : bool
@@ -499,7 +506,7 @@ class IllumioConnector(BaseConnector):
 
     def parse_and_validate_date(self, dt_str, action_result, key):
         """
-        Converts input date to iso8601 datetime.
+        Convert input date to iso8601 datetime.
 
         :param dt_str: datetime string
         :param action_result: action result object
@@ -533,7 +540,7 @@ class IllumioConnector(BaseConnector):
 
     def check_starttime_greater_than_endtime(self, datetime_start, datetime_end):
         """
-        Checks if starttime is greater than endtime or not.
+        Check if the starttime is greater than endtime or not.
 
         :param datetime_start: start datetime obj
         :param datetime_end: end datetime obj
@@ -543,7 +550,7 @@ class IllumioConnector(BaseConnector):
 
     def connect_pce(self, action_result):
         """
-        Connects to the PCE server.
+        Connect the PCE server.
 
         :return: pce obj value
         """
@@ -568,12 +575,11 @@ class IllumioConnector(BaseConnector):
 
     def convert_object_to_json(self, obj, action_result):
         """
-        Converts result object to json.
+        Convert result object to json.
 
         :param obj: result object
         :return : json
         """
-
         try:
             json_data = obj.to_json()
         except Exception as e:
@@ -586,7 +592,7 @@ class IllumioConnector(BaseConnector):
 
     def _validate_integer(self, action_result, parameter, key, min=0, max=sys.maxsize):
         """
-        Checks if the provided input parameter value is a integer and returns the integer value of the parameter itself.
+        Check if the provided input parameter value is a integer and returns the integer value of the parameter itself.
 
         :param action_result: Action result or BaseConnector object
         :param parameter: input parameter
