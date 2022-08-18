@@ -369,7 +369,6 @@ class IllumioConnector(BaseConnector):
         workload_hrefs_list = self.handle_comma_seperated_string(
             param["workload_hrefs"]
         )
-        len_workload_list = len(workload_hrefs_list)
         virtual_service_href = param["virtual_service_href"]
 
         ret_val = self.connect_pce(action_result)
@@ -388,41 +387,9 @@ class IllumioConnector(BaseConnector):
                 ]
             )
 
-            service_binding_list_for_virtual_service = self._pce.service_bindings.get(
-                params={"virtual_service": virtual_service_href}
+            action_result.set_status(
+                phantom.APP_SUCCESS, "Successfully bound workloads with virtual service"
             )
-            bounded_workload_with_virtual_service_list = [
-                service_binding.workload.href
-                for service_binding in service_binding_list_for_virtual_service
-            ]
-
-            for workload in bounded_workload_with_virtual_service_list:
-                if workload in workload_hrefs_list:
-                    workload_hrefs_list.remove(workload)
-
-            if workload_hrefs_list:
-                err_msg = "Unable to bind following workloads: {}".format(
-                    workload_hrefs_list
-                )
-                action_result.set_status(
-                    phantom.APP_SUCCESS,
-                    "Successfully bound {} workload with virtual service. {}".format(
-                        len_workload_list - len(workload_hrefs_list), err_msg
-                    ),
-                )
-
-            else:
-                action_result.set_status(
-                    phantom.APP_SUCCESS,
-                    "Successfully bound {} workload with virtual service".format(
-                        len_workload_list
-                    ),
-                )
-
-            if not service_bindings["service_bindings"] and not workload_hrefs_list:
-                return action_result.set_status(
-                    phantom.APP_ERROR, "Workloads already bounded"
-                )
 
         except IllumioException as e:
             return action_result.set_status(
@@ -549,7 +516,7 @@ class IllumioConnector(BaseConnector):
 
     def connect_pce(self, action_result):
         """
-        Connect the PCE server.
+        Connect to the PCE server.
 
         :return: pce obj value
         """
