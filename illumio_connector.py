@@ -241,30 +241,28 @@ class IllumioConnector(BaseConnector):
         )
 
     def _handle_get_ip_lists(self, param):
-        name = param["name"]
+        name = param.get("name")
+        description = param.get("description")
+        fqdn = param.get("fqdn")
+        ip_address = param.get("ip_address")
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ip_list_data = None
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         try:
-            ip_list = self._pce.ip_lists.get(params={"name": name})
-            for data in ip_list:
-                if name == data.name:
-                    ip_list_data = data
-                    action_result.set_status(
-                        phantom.APP_SUCCESS, "Successfully fetched IP List"
-                    )
-                    break
-            if not ip_list_data:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    "IP List with name '{}' does not exist".format(name),
-                )
+            ip_list = self._pce.ip_lists.get(
+                params={
+                    "name": name,
+                    "description": description,
+                    "fqdn": fqdn,
+                    "ip_address": ip_address,
+                }
+            )
+            output_msg = "Successfully fetched IP List" if ip_list else "No Data Found"
+            action_result.set_status(phantom.APP_SUCCESS, output_msg)
 
         except IllumioException as e:
             return action_result.set_status(
@@ -272,7 +270,11 @@ class IllumioConnector(BaseConnector):
                 "Encountered error fetching IP List: {}".format(e),
             )
 
-        result = self.convert_object_to_json(ip_list_data, action_result)
+        result = {
+            "ip_lists": [
+                self.convert_object_to_json(lists, action_result) for lists in ip_list
+            ]
+        }
         action_result.add_data(result)
         return action_result.get_status()
 
