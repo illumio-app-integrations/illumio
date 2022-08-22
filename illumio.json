@@ -87,7 +87,11 @@
                     "data_type": "numeric",
                     "order": 2,
                     "description": "Port number (Valid port range is 1-65535)",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "port"
+                    ]
                 },
                 "protocol": {
                     "data_type": "string",
@@ -109,56 +113,118 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-08-02T14:32:45.135761"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_decisions",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ],
+                    "column_name": "Port",
+                    "column_order": 7,
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "tcp"
+                    ],
+                    "column_name": "Protocol",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-08-02T14:32:45.135761"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.traffic_flows.*.dst.ip",
                     "data_type": "string",
                     "example_values": [
                         "13.234.176.102"
                     ],
-                    "column_name": "DST IP",
+                    "column_name": "Dst IP",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.src.ip",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.href",
                     "data_type": "string",
                     "example_values": [
-                        "10.50.4.153"
+                        "/orgs/1/sec_policy/draft/virtual_services/16ab3e56-7cb8-438e-a580-89d55632dae4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Virtual-service-22"
                     ],
-                    "column_name": "SRC IP",
-                    "column_order": 1
+                    "column_name": "Dst Virtual Service",
+                    "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "workload-localhost.localdomain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.os_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "linux"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.hostname",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.hostname",
                     "data_type": "string",
                     "example_values": [
                         "localhost.localdomain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.state",
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.href",
                     "data_type": "string",
                     "example_values": [
-                        "timed out"
+                        "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
+                    ],
+                    "column_name": "Dst Workload Href",
+                    "column_order": 6,
+                    "contains": [
+                        "workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.labels.*.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/labels/1240"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "workload-localhost.localdomain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.os_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "linux"
                     ]
                 },
                 {
@@ -173,31 +239,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.service.port",
-                    "data_type": "numeric",
-                    "example_values": [
-                        22
-                    ],
-                    "column_name": "SERVICE PORT",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.service.proto",
-                    "data_type": "numeric",
-                    "example_values": [
-                        6
-                    ],
-                    "column_name": "SERVICE PROTOCOL NUMBER",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.service.user_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "devuser"
                     ]
                 },
                 {
@@ -222,46 +263,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.last_detected",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.port",
+                    "data_type": "numeric",
                     "example_values": [
-                        "2022-07-28T09:07:55Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.first_detected",
-                    "data_type": "string",
-                    "example_values": [
-                        "2022-07-28T09:07:55Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "workload-localhost.localdomain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.os_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "linux"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.hostname",
-                    "data_type": "string",
-                    "example_values": [
-                        "localhost.localdomain"
-                    ]
+                        22
+                    ],
+                    "column_name": "Service Port",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.traffic_flows.*.service.process_name",
@@ -271,20 +279,29 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.service.proto",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ],
+                    "column_name": "Service Protocol Number",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.service.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "/orgs/1/sec_policy/draft/virtual_services/16ab3e56-7cb8-438e-a580-89d55632dae4"
+                        "devuser"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.virtual_service.name",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.ip",
                     "data_type": "string",
                     "example_values": [
-                        "Virtual-service-22"
+                        "10.50.4.153"
                     ],
-                    "column_name": "DST VIRTUAL SERVICE",
-                    "column_order": 5
+                    "column_name": "Src IP",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.traffic_flows.*.src.ip_lists.*.href",
@@ -301,10 +318,63 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.traffic_flows.*.dst.workload.labels.*.href",
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.hostname",
                     "data_type": "string",
                     "example_values": [
-                        "/orgs/1/labels/1240"
+                        "localhost.localdomain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/workloads/5913e8a8-2f74-4db1-b5aa-280f75dc66b3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "workload-localhost.localdomain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.src.workload.os_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "timed out"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.first_detected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-07-28T09:07:55Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic_flows.*.timestamp_range.last_detected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-07-28T09:07:55Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "message"
                     ]
                 },
                 {
@@ -319,58 +389,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "message"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.start_time",
-                    "data_type": "string",
-                    "example_values": [
-                        "2022-08-02T14:32:45.135761"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.end_time",
-                    "data_type": "string",
-                    "example_values": [
-                        "2022-08-02T14:32:45.135761"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.port",
-                    "data_type": "numeric",
-                    "example_values": [
-                        22
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.protocol",
-                    "data_type": "string",
-                    "example_values": [
-                        "tcp"
-                    ],
-                    "column_name": "PROTOCOL",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.parameter.policy_decisions",
-                    "data_type": "string",
-                    "example_values": [
-                        "unknown"
                     ]
                 }
             ],
@@ -391,7 +409,11 @@
                     "data_type": "numeric",
                     "order": 0,
                     "description": "Port",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "port"
+                    ]
                 },
                 "protocol": {
                     "data_type": "string",
@@ -432,6 +454,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         22
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -469,7 +494,10 @@
                         "/orgs/1/sec_policy/draft/virtual_services/a62bb999-73ab-42d7-87ab-d493ccc131b6"
                     ],
                     "column_name": "Hrefs",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "virtual service href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -558,7 +586,14 @@
                     "data_type": "string",
                     "order": 0,
                     "description": "Object HREFs",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href",
+                        "rule href",
+                        "ruleset href",
+                        "enforcement boundary href"
+                    ]
                 }
             },
             "output": [
@@ -575,6 +610,11 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/virtual_services/a62bb999-73ab-42d7-87ab-d493ccc131b6"
+                    ],
+                    "contains": [
+                        "virtual service href",
+                        "rule href",
+                        "enforcement boundary href"
                     ]
                 },
                 {
@@ -605,7 +645,10 @@
                         "/orgs/1/sec_policy/1221"
                     ],
                     "column_name": "Href",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "provision href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.object_counts.enforcement_boundaries",
@@ -829,6 +872,11 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/ip_lists/1"
+                    ],
+                    "column_name": "Href",
+                    "column_order": 1,
+                    "contains": [
+                        "ip list href"
                     ]
                 },
                 {
@@ -972,7 +1020,10 @@
                         "/orgs/1/sec_policy/draft/rule_sets/1611"
                     ],
                     "column_name": "Href",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "ruleset href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -1139,19 +1190,35 @@
                     "data_type": "string",
                     "order": 0,
                     "description": "List of HREFS",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
                 },
                 "consumers": {
                     "data_type": "string",
                     "order": 1,
                     "description": "List of HREFS",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
                 },
                 "ruleset_href": {
                     "data_type": "string",
                     "order": 2,
                     "description": "Ruleset HREFS",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ruleset href"
+                    ]
                 },
                 "resolve_consumers_as": {
                     "data_type": "string",
@@ -1184,6 +1251,11 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
+                    ],
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
                     ]
                 },
                 {
@@ -1191,6 +1263,11 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
+                    ],
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
                     ]
                 },
                 {
@@ -1212,6 +1289,9 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
+                    ],
+                    "contains": [
+                        "ruleset href"
                     ]
                 },
                 {
@@ -1221,7 +1301,10 @@
                         "/orgs/1/sec_policy/draft/ip_lists/958"
                     ],
                     "column_name": "Consumer",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "ip list href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.created_at",
@@ -1251,7 +1334,10 @@
                         "/orgs/1/sec_policy/draft/rule_sets/11110/sec_rules/18665"
                     ],
                     "column_name": "Href",
-                    "column_order": 2
+                    "column_order": 2,
+                    "contains": [
+                        "ruleset href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ingress_services",
@@ -1280,7 +1366,10 @@
                         "/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"
                     ],
                     "column_name": "Provider",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "virtual service href"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sec_connect",
@@ -1353,6 +1442,610 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "create enforcement boundary",
+            "identifier": "create_enforcement_boundary",
+            "description": "Creates enforcement boundary",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "providers": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "List of hrefs",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
+                },
+                "consumers": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "List of hrefs",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
+                },
+                "name": {
+                    "data_type": "string",
+                    "order": 4,
+                    "description": "Name of enforcement boundary",
+                    "required": true
+                },
+                "port": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "Port number (Valid port range is 1-65535)",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "port"
+                    ]
+                },
+                "protocol": {
+                    "data_type": "string",
+                    "value_list": [
+                        "TCP",
+                        "UDP"
+                    ],
+                    "order": 3,
+                    "description": "Protocol",
+                    "default": "TCP",
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "title": "Enforcement Boundary"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.consumers",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/draft/ip_lists/958"
+                    ],
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_y_eb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.providers",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/draft/ip_lists/958"
+                    ],
+                    "contains": [
+                        "virtual service href",
+                        "ip list href",
+                        "workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.consumers.*.ip_list.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/draft/ip_lists/958"
+                    ],
+                    "column_name": "Consumers",
+                    "column_order": 5,
+                    "contains": [
+                        "ip list href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/active/enforcement_boundaries/1019"
+                    ],
+                    "column_name": "Href",
+                    "column_order": 1,
+                    "contains": [
+                        "enforcement boundary href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ingress_services.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ],
+                    "column_name": "Ingress Service Port",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.ingress_services.*.proto",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ],
+                    "column_name": "Ingress Service Protocol",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_y_eb"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.providers.*.actors",
+                    "data_type": "string",
+                    "example_values": [
+                        "ams"
+                    ],
+                    "column_name": "Providers",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created enforcement boundary"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get workloads",
+            "identifier": "get_workloads",
+            "description": "Gets list of workloads for a given enforcement mode",
+            "type": "investigative",
+            "read_only": true,
+            "parameters": {
+                "enforcement_mode": {
+                    "data_type": "string",
+                    "value_list": [
+                        "IDLE",
+                        "VISIBILITY_ONLY",
+                        "FULL",
+                        "SELECTIVE"
+                    ],
+                    "order": 0,
+                    "description": "Enforcement mode",
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "title": "Workloads"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enforcement_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "visibility_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.config.log_traffic",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.config.mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "illuminated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.config.security_policy_update_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "adaptive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.config.visibility_level",
+                    "data_type": "string",
+                    "example_values": [
+                        "flow_summary"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/agents/62194"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.secure_connect.matching_issuer_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "20.2.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.firewall_rule_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.fw_config_current",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.last_heartbeat_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-22T01:52:38.527248Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.managed_since",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-22T01:52:37.714209Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.security_policy_applied_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-08-07T06:40:24.709347Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.security_policy_received_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-08-07T06:40:24.709347Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.security_policy_refresh_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-08-07T06:40:24.709347Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.security_policy_sync_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "syncing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.uptime_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.unpair_allowed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.blocked_connection_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "drop"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.containers_inherit_host_policy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.created_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-22T01:52:37.679879Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.created_by.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/agents/62194"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated by System Administrator [ven02375.service-now.com] at June 16, 2022 8:47:22 AM PDT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.enforcement_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "visibility_only"
+                    ],
+                    "column_name": "Enforcement Mode",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "perf-workload-62194"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/workloads/bb558b7b-bd43-41f1-bdd9-e576728ca81b"
+                    ],
+                    "column_name": "Href",
+                    "column_order": 0,
+                    "contains": [
+                        "workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "fd00::200:a:0:f2f2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.cidr_block",
+                    "data_type": "numeric",
+                    "example_values": [
+                        64
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.default_gateway_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.link_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.loopback",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "eth0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.network.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/networks/04ac9819-d438-42b6-b892-2968e32ca255"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.interfaces.*.network_detection_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "single_private_brn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.labels.*.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/labels/1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "v-11.186"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.online",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.os_detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "4.4.0-97-generic #120-Ubuntu SMP Tue Sep 19 17:28:18 UTC 2017 (Ubuntu 16.04.1 LTS)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.os_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ubuntu-x86_64-xenial"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.public_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "66.151.147.220"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.updated_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-02-07T16:02:00.917702Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.updated_by.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/users/30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.ven.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/vens/bb558b7b-bd43-41f1-bdd9-e576728ca81b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.visibility_level",
+                    "data_type": "string",
+                    "example_values": [
+                        "flow_summary"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully fetched workloads"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "create service binding",
             "identifier": "create_service_binding",
             "description": "Binds workload with virtual service",
@@ -1363,13 +2056,21 @@
                     "data_type": "string",
                     "order": 0,
                     "description": "List of workload HREFS",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "workload href"
+                    ]
                 },
                 "virtual_service_href": {
                     "data_type": "string",
                     "order": 1,
                     "description": "Virtual service HREF",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "virtual service href"
+                    ]
                 }
             },
             "render": {
@@ -1390,6 +2091,9 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/virtual_service/958"
+                    ],
+                    "contains": [
+                        "virtual service href"
                     ]
                 },
                 {
@@ -1397,13 +2101,120 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/draft/workload/958"
+                    ],
+                    "contains": [
+                        "workload href"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
+                    "data_path": "action_result.data.*.errors.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "/orgs/1/service_bindings/c7098f30-8460-4873-a06c-8df87dc1ba1d"
+                        "uniqueness_failure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service_bindings.*.href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/service_bindings/bffce2c8-d54c-4d43-8f0b-75e1af3d3b84"
+                    ],
+                    "column_name": "HREF",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully bound 1 workload with virtual service"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update enforcement mode",
+            "identifier": "update_enforcement_mode",
+            "description": "Update enforcement mode of workloads",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "workload_hrefs": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "List of hrefs",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "workload href"
+                    ]
+                }
+            },
+            "render": {
+                "type": "table",
+                "title": "Service Binding"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.workload_hrefs",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/workloads/c7098f30-8460-4873-a06c-8df87dc1ba1d"
+                    ],
+                    "contains": [
+                        "workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.errors.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Invalid URI: {/orgs/1/workloads/6ee0434b-46a8-48e3-b813-bdde9ccb1c}"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.errors.*.token",
+                    "data_type": "string",
+                    "example_values": [
+                        "invalid_uri"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.href",
+                    "data_type": "string",
+                    "example_values": "/orgs/1/workloads/bd004cd5-f37c-4823-9ec9-cb1773dd11fc",
+                    "column_name": "Href",
+                    "column_order": 0,
+                    "contains": [
+                        "workload href"
                     ]
                 },
                 {
@@ -1414,7 +2225,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "message"
+                        "Successfully updated workloads"
                     ]
                 },
                 {

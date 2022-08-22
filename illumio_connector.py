@@ -406,6 +406,140 @@ class IllumioConnector(BaseConnector):
         action_result.add_data(service_bindings)
         return action_result.get_status()
 
+    def _handle_create_enforcement_boundary(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        providers_list = self.handle_comma_seperated_string(param["providers"])
+        consumers_list = self.handle_comma_seperated_string(param["consumers"])
+
+        ret_val, port = self._validate_integer(
+            action_result, param["port"], "port", max=PORT_MAX_VALUE
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        protocol = param["protocol"].lower()
+        if protocol not in PROTOCOL_LIST:
+            return action_result.set_status(
+                phantom.APP_ERROR, ILLUMIO_INVALID_PROTOCOL_MSG
+            )
+
+        name = param["name"]
+        enforcement_boundary = None
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            enforcement_boundary = illumio.EnforcementBoundary.build(
+                name=name,
+                providers=providers_list,
+                consumers=consumers_list,
+                ingress_services=[{"port": port, "proto": protocol}],
+            )
+            enforcement_boundary = self._pce.enforcement_boundaries.create(
+                enforcement_boundary
+            )
+            action_result.set_status(
+                phantom.APP_SUCCESS, "Successfully created enforcement boundary"
+            )
+        except IllumioException as e:
+            if ILLUMIO_EXISTING_ENFORCEMENT_BOUNDARY_MSG in e.args[0]:
+                enforcement_boundary_list = self._pce.enforcement_boundaries.get(
+                    params={"name": name}
+                )
+                for enforcement in enforcement_boundary_list:
+                    if name == enforcement.name:
+                        enforcement_boundary = enforcement
+                        action_result.set_status(
+                            phantom.APP_SUCCESS,
+                            "Found existing enforcement boundary with name {}".format(
+                                name
+                            ),
+                        )
+                        break
+            else:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Encountered error creating enforcement boundary: {}".format(e),
+                )
+
+        result = self.convert_object_to_json(enforcement_boundary, action_result)
+        action_result.add_data(result)
+        return action_result.get_status()
+
+    def _handle_get_workloads(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        enforcement_mode = param["enforcement_mode"].lower()
+        if enforcement_mode not in ENFORCEMENT_MODE_LIST:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Please enter a valid value for 'enforcement mode' parameter",
+            )
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            workloads_list = self._pce.workloads.get(
+                policy_version="active",
+                params={"enforcement_mode": enforcement_mode},
+            )
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error fetching workloads: {}".format(e),
+            )
+
+        result = {
+            "workloads": [
+                self.convert_object_to_json(workload, action_result)
+                for workload in workloads_list
+            ]
+        }
+        action_result.add_data(result)
+        return action_result.set_status(
+            phantom.APP_SUCCESS, "Successfully fetched workloads"
+        )
+
+    def _handle_update_enforcement_mode(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        workload_hrefs_list = self.handle_comma_seperated_string(
+            param["workload_hrefs"]
+        )
+
+        ret_val = self.connect_pce(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            response = self._pce.workloads.bulk_update(
+                [
+                    {
+                        "enforcement_mode": "selective",
+                        "href": wl,
+                    }
+                    for wl in workload_hrefs_list
+                ]
+            )
+
+            action_result.set_status(
+                phantom.APP_SUCCESS, "Successfully updated workloads"
+            )
+
+        except IllumioException as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Encountered error updating enforcement mode: {}".format(e),
+            )
+
+        action_result.add_data(response)
+        return action_result.get_status()
+
     def handle_action(self, param):
         """Get current action identifier and call member function of its own to handle the action."""
         ret_val = phantom.APP_SUCCESS
@@ -431,6 +565,12 @@ class IllumioConnector(BaseConnector):
             ret_val = self._handle_create_rule(param)
         elif action_id == "create_service_binding":
             ret_val = self._handle_create_service_binding(param)
+        elif action_id == "create_enforcement_boundary":
+            ret_val = self._handle_create_enforcement_boundary(param)
+        elif action_id == "get_workloads":
+            ret_val = self._handle_get_workloads(param)
+        elif action_id == "update_enforcement_mode":
+            ret_val = self._handle_update_enforcement_mode(param)
 
         return ret_val
 
