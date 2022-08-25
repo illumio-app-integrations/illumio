@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Illumio",
     "license": "Copyright (c) Illumio, 2022",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2022-07-19T07:24:45.112655Z",
     "package_name": "phantom_illumio",
     "main_module": "illumio_connector.py",
@@ -67,7 +67,7 @@
             "action": "get traffic analysis",
             "identifier": "get_traffic_analysis",
             "description": "List of traffic on specified port",
-            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss. Supported timezone offset format for parameters 'start_time' and 'end_time' are Z(UTC), ±HH:MM, ±HHMM and ±HH.",
+            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss. Supported timezone offset format for parameters 'start_time' and 'end_time' are Z(UTC), HH:MM, HHMM and HH.",
             "type": "investigative",
             "read_only": true,
             "parameters": {
@@ -203,7 +203,7 @@
                     "column_name": "Dst Workload Href",
                     "column_order": 6,
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -496,7 +496,7 @@
                     "column_name": "Hrefs",
                     "column_order": 0,
                     "contains": [
-                        "virtual service href"
+                        "illumio virtual service href"
                     ]
                 },
                 {
@@ -513,7 +513,10 @@
                         22
                     ],
                     "column_name": "Port",
-                    "column_order": 1
+                    "column_order": 1,
+                    "contains": [
+                        "port"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.service_ports.*.proto",
@@ -589,10 +592,10 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href",
-                        "rule href",
-                        "ruleset href",
-                        "enforcement boundary href"
+                        "illumio virtual service href",
+                        "illumio rule href",
+                        "illumio ruleset href",
+                        "illumio enforcement boundary href"
                     ]
                 }
             },
@@ -612,9 +615,10 @@
                         "/orgs/1/sec_policy/draft/virtual_services/a62bb999-73ab-42d7-87ab-d493ccc131b6"
                     ],
                     "contains": [
-                        "virtual service href",
-                        "rule href",
-                        "enforcement boundary href"
+                        "illumio virtual service href",
+                        "illumio rule href",
+                        "illumio ruleset href",
+                        "illumio enforcement boundary href"
                     ]
                 },
                 {
@@ -643,11 +647,6 @@
                     "data_type": "string",
                     "example_values": [
                         "/orgs/1/sec_policy/1221"
-                    ],
-                    "column_name": "Href",
-                    "column_order": 0,
-                    "contains": [
-                        "provision href"
                     ]
                 },
                 {
@@ -714,6 +713,19 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.provisioned_href",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/draft/virtual_services/a62bb999-73ab-42d7-87ab-d493ccc131b6"
+                    ],
+                    "contains": [
+                        "illumio virtual service href",
+                        "illumio rule href",
+                        "illumio ruleset href",
+                        "illumio enforcement boundary href"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.version",
                     "data_type": "numeric",
                     "example_values": [
@@ -754,8 +766,9 @@
                 }
             ],
             "render": {
-                "type": "table",
-                "title": "Provision"
+                "type": "custom",
+                "title": "Provision Objects",
+                "view": "illumio_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -769,26 +782,22 @@
                 "name": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Name of IP list",
-                    "required": false
+                    "description": "Name of IP list"
                 },
                 "description": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "Description of IP list",
-                    "required": false
+                    "description": "Description of IP list"
                 },
                 "fqdn": {
                     "data_type": "string",
                     "order": 2,
-                    "description": "FQDN of IP list",
-                    "required": false
+                    "description": "FQDN of IP list"
                 },
                 "ip_address": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "IP Address linked with IP List",
-                    "required": false
+                    "description": "IP Address linked with IP List"
                 }
             },
             "render": {
@@ -876,7 +885,7 @@
                     "column_name": "Href",
                     "column_order": 1,
                     "contains": [
-                        "ip list href"
+                        "illumio ip list href"
                     ]
                 },
                 {
@@ -1022,7 +1031,7 @@
                     "column_name": "Href",
                     "column_order": 0,
                     "contains": [
-                        "ruleset href"
+                        "illumio ruleset href"
                     ]
                 },
                 {
@@ -1193,9 +1202,9 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 "consumers": {
@@ -1205,9 +1214,9 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 "ruleset_href": {
@@ -1217,7 +1226,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "ruleset href"
+                        "illumio ruleset href"
                     ]
                 },
                 "resolve_consumers_as": {
@@ -1253,9 +1262,9 @@
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
                     ],
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -1265,9 +1274,9 @@
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
                     ],
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -1291,7 +1300,7 @@
                         "/orgs/1/sec_policy/draft/rule_sets/1611/sec_rules/1914"
                     ],
                     "contains": [
-                        "ruleset href"
+                        "illumio ruleset href"
                     ]
                 },
                 {
@@ -1303,7 +1312,7 @@
                     "column_name": "Consumer",
                     "column_order": 0,
                     "contains": [
-                        "ip list href"
+                        "illumio ip list href"
                     ]
                 },
                 {
@@ -1336,7 +1345,7 @@
                     "column_name": "Href",
                     "column_order": 2,
                     "contains": [
-                        "ruleset href"
+                        "illumio ruleset href"
                     ]
                 },
                 {
@@ -1368,7 +1377,7 @@
                     "column_name": "Provider",
                     "column_order": 1,
                     "contains": [
-                        "virtual service href"
+                        "illumio virtual service href"
                     ]
                 },
                 {
@@ -1455,9 +1464,9 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 "consumers": {
@@ -1467,9 +1476,9 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 "name": {
@@ -1520,9 +1529,9 @@
                         "/orgs/1/sec_policy/draft/ip_lists/958"
                     ],
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -1556,9 +1565,9 @@
                         "/orgs/1/sec_policy/draft/ip_lists/958"
                     ],
                     "contains": [
-                        "virtual service href",
-                        "ip list href",
-                        "workload href"
+                        "illumio virtual service href",
+                        "illumio ip list href",
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -1570,7 +1579,7 @@
                     "column_name": "Consumers",
                     "column_order": 5,
                     "contains": [
-                        "ip list href"
+                        "illumio ip list href"
                     ]
                 },
                 {
@@ -1582,7 +1591,7 @@
                     "column_name": "Href",
                     "column_order": 1,
                     "contains": [
-                        "enforcement boundary href"
+                        "illumio enforcement boundary href"
                     ]
                 },
                 {
@@ -1665,8 +1674,47 @@
                         "SELECTIVE"
                     ],
                     "order": 0,
-                    "description": "Enforcement mode",
-                    "required": true
+                    "description": "Enforcement mode"
+                },
+                "connectivity": {
+                    "data_type": "string",
+                    "value_list": [
+                        "ONLINE",
+                        "OFFLINE",
+                        "UNMANAGED"
+                    ],
+                    "order": 1,
+                    "description": "Connectivity"
+                },
+                "name": {
+                    "data_type": "string",
+                    "order": 2,
+                    "description": "Workload Name"
+                },
+                "labels": {
+                    "data_type": "string",
+                    "order": 3,
+                    "description": "Labels"
+                },
+                "public_ip_address": {
+                    "data_type": "string",
+                    "order": 4,
+                    "description": "Public IP Address"
+                },
+                "description": {
+                    "data_type": "string",
+                    "order": 5,
+                    "description": "Workload Description"
+                },
+                "hostname": {
+                    "data_type": "string",
+                    "order": 6,
+                    "description": "Hostname"
+                },
+                "os_id": {
+                    "data_type": "string",
+                    "order": 7,
+                    "description": "OS id"
                 }
             },
             "render": {
@@ -1683,10 +1731,59 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.connectivity",
+                    "data_type": "string",
+                    "example_values": [
+                        "online"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated by System Administrator [dev112443.now.com] at February 23, 2022 2:11:30 AM PST"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.enforcement_mode",
                     "data_type": "string",
                     "example_values": [
                         "visibility_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip-172-31-0-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.labels",
+                    "data_type": "string",
+                    "example_values": [
+                        "API"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-vs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.os_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ubuntu-x86_64-xenial"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.public_ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
                     ]
                 },
                 {
@@ -1750,6 +1847,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.instance_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0c1813821cdca1a8b"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.workloads.*.agent.status.last_heartbeat_on",
                     "data_type": "string",
                     "example_values": [
@@ -1796,6 +1900,13 @@
                     "data_type": "string",
                     "example_values": [
                         "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.agent.status.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2c+i-0c1813821cdca1a8b"
                     ]
                 },
                 {
@@ -1848,6 +1959,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.workloads.*.data_center",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.workloads.*.data_center_zone",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2c"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.workloads.*.deleted",
                     "data_type": "boolean",
                     "example_values": [
@@ -1871,6 +1996,13 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.data.*.workloads.*.firewall_coexistence.illumio_primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.workloads.*.hostname",
                     "data_type": "string",
                     "example_values": [
@@ -1886,7 +2018,7 @@
                     "column_name": "Href",
                     "column_order": 0,
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -1990,6 +2122,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.workloads.*.service_provider",
+                    "data_type": "string",
+                    "example_values": [
+                        "amazonaws.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.workloads.*.updated_at",
                     "data_type": "string",
                     "example_values": [
@@ -2059,7 +2198,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 "virtual_service_href": {
@@ -2069,7 +2208,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "virtual service href"
+                        "illumio virtual service href"
                     ]
                 }
             },
@@ -2093,7 +2232,7 @@
                         "/orgs/1/sec_policy/draft/virtual_service/958"
                     ],
                     "contains": [
-                        "virtual service href"
+                        "illumio virtual service href"
                     ]
                 },
                 {
@@ -2103,7 +2242,7 @@
                         "/orgs/1/sec_policy/draft/workload/958"
                     ],
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -2119,7 +2258,7 @@
                     "example_values": [
                         "/orgs/1/service_bindings/bffce2c8-d54c-4d43-8f0b-75e1af3d3b84"
                     ],
-                    "column_name": "HREF",
+                    "column_name": "Href",
                     "column_order": 0
                 },
                 {
@@ -2164,7 +2303,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 }
             },
@@ -2188,7 +2327,7 @@
                         "/orgs/1/workloads/c7098f30-8460-4873-a06c-8df87dc1ba1d"
                     ],
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -2214,7 +2353,7 @@
                     "column_name": "Href",
                     "column_order": 0,
                     "contains": [
-                        "workload href"
+                        "illumio workload href"
                     ]
                 },
                 {
@@ -2250,7 +2389,7 @@
         "wheel": [
             {
                 "module": "illumio",
-                "input_file": "wheels/shared/illumio-1.0.3-py3-none-any.whl"
+                "input_file": "wheels/shared/illumio-1.0.4-py3-none-any.whl"
             },
             {
                 "module": "pytz",

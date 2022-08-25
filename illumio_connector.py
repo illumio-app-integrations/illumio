@@ -1,6 +1,6 @@
 # File: illumio_connector.py
 #
-# Copyright (c) 2022 Illumio.
+# Copyright (c) Illumio, 2022
 #
 # This unpublished material is proprietary to Illumio.
 # All rights reserved. The methods and
@@ -98,7 +98,7 @@ class IllumioConnector(BaseConnector):
         protocol = param["protocol"].lower()
         if protocol not in PROTOCOL_LIST:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please enter a valid value for 'protocol' parameter"
+                phantom.APP_ERROR, ILLUMIO_INVALID_PROTOCOL_MSG
             )
 
         policy_decisions_string = param["policy_decisions"].lower()
@@ -124,7 +124,7 @@ class IllumioConnector(BaseConnector):
                 traffic_query=traffic_query,
             )
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error while running traffic query: {}".format(e),
@@ -184,8 +184,8 @@ class IllumioConnector(BaseConnector):
                 phantom.APP_SUCCESS, "Successfully created virtual service"
             )
 
-        except IllumioException as e:
-            if ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG in e:
+        except Exception as e:
+            if ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG in e.args[0]:
                 service_list = self._pce.virtual_services.get(
                     params={"name": service_name}
                 )
@@ -226,7 +226,7 @@ class IllumioConnector(BaseConnector):
                 hrefs=hrefs_list,
             )
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error provisioning object: {}".format(e),
@@ -235,6 +235,10 @@ class IllumioConnector(BaseConnector):
         result = self.convert_object_to_json(
             provisioned_virtual_service_obj, action_result
         )
+        provisioned_href_list = [
+            illumio.convert_draft_href_to_active(href) for href in hrefs_list
+        ]
+        result["provisioned_href"] = provisioned_href_list
         action_result.add_data(result)
         return action_result.set_status(
             phantom.APP_SUCCESS, "Successfully provisioned object"
@@ -264,7 +268,7 @@ class IllumioConnector(BaseConnector):
             output_msg = "Successfully fetched IP List" if ip_list else "No Data Found"
             action_result.set_status(phantom.APP_SUCCESS, output_msg)
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error fetching IP List: {}".format(e),
@@ -295,8 +299,8 @@ class IllumioConnector(BaseConnector):
             action_result.set_status(
                 phantom.APP_SUCCESS, "Successfully created ruleset"
             )
-        except IllumioException as e:
-            if ILLUMIO_EXISTING_RULE_SET_MSG in e:
+        except Exception as e:
+            if ILLUMIO_EXISTING_OBJECT_MSG in e.args[0]:
                 ruleset_list = self._pce.rule_sets.get(params={"name": name})
                 for ruleset in ruleset_list:
                     if name == ruleset.name:
@@ -353,7 +357,7 @@ class IllumioConnector(BaseConnector):
                 ingress_services=[],
             )
             rule = self._pce.rules.create(rule, parent=ruleset_href)
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error creating rule: {}".format(e),
@@ -371,7 +375,9 @@ class IllumioConnector(BaseConnector):
         workload_hrefs_list = self.handle_comma_seperated_string(
             param["workload_hrefs"]
         )
-        virtual_service_href = param["virtual_service_href"]
+        virtual_service_href = illumio.convert_draft_href_to_active(
+            param["virtual_service_href"]
+        )
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
@@ -393,7 +399,7 @@ class IllumioConnector(BaseConnector):
                 phantom.APP_SUCCESS, "Successfully bound workloads with virtual service"
             )
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error creating service binding: {}".format(e),
@@ -444,8 +450,8 @@ class IllumioConnector(BaseConnector):
             action_result.set_status(
                 phantom.APP_SUCCESS, "Successfully created enforcement boundary"
             )
-        except IllumioException as e:
-            if ILLUMIO_EXISTING_ENFORCEMENT_BOUNDARY_MSG in e.args[0]:
+        except Exception as e:
+            if ILLUMIO_EXISTING_OBJECT_MSG in e.args[0]:
                 enforcement_boundary_list = self._pce.enforcement_boundaries.get(
                     params={"name": name}
                 )
@@ -472,12 +478,36 @@ class IllumioConnector(BaseConnector):
     def _handle_get_workloads(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        enforcement_mode = param["enforcement_mode"].lower()
+        enforcement_mode = (
+            param.get("enforcement_mode").lower()
+            if param.get("enforcement_mode")
+            else None
+        )
+        connectivity = (
+            param.get("connectivity").lower() if param.get("connectivity") else None
+        )
+        labels = self.handle_comma_seperated_string(param.get("labels", ""))
+        managed = True
+
         if enforcement_mode not in ENFORCEMENT_MODE_LIST:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Please enter a valid value for 'enforcement mode' parameter",
+                "Please enter a valid value for 'enforcement_mode' parameter",
             )
+
+        if connectivity not in CONNECTIVITY_LIST:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Please enter a valid value for 'connectivity' parameter",
+            )
+
+        if connectivity == "online":
+            connectivity = True
+        elif connectivity == "offline":
+            connectivity = False
+        elif connectivity == "unmanaged":
+            managed = False
+            connectivity = None
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
@@ -486,9 +516,19 @@ class IllumioConnector(BaseConnector):
         try:
             workloads_list = self._pce.workloads.get(
                 policy_version="active",
-                params={"enforcement_mode": enforcement_mode},
+                params={
+                    "managed": managed,
+                    "enforcement_mode": enforcement_mode,
+                    "online": connectivity,
+                    "name": param.get("name"),
+                    "labels": [labels],
+                    "ip_address": param.get("public_ip_address"),
+                    "description": param.get("description"),
+                    "hostname": param.get("hostname"),
+                    "os_id": param.get("os_id"),
+                },
             )
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error fetching workloads: {}".format(e),
@@ -531,7 +571,7 @@ class IllumioConnector(BaseConnector):
                 phantom.APP_SUCCESS, "Successfully updated workloads"
             )
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error updating enforcement mode: {}".format(e),
