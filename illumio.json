@@ -36,7 +36,7 @@
         "api_key": {
             "required": true,
             "data_type": "string",
-            "description": "API key",
+            "description": "API Key",
             "order": 2
         },
         "api_secret": {
@@ -67,7 +67,7 @@
             "action": "get traffic analysis",
             "identifier": "get_traffic_analysis",
             "description": "List of traffic on specified port",
-            "verbose": "Alllowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss. Supported timezone offset format for parameters 'start_time' and 'end_time' are Z(UTC), HH:MM, HHMM and HH.",
+            "verbose": "Allowed values for 'policy_decisions' parameter are: allowed, unknown, potentially_blocked, and blocked. Valid date format allowed: MM/DD/YYYY hh:mm:ss and YYYY/MM/DD hh:mm:ss. Supported timezone offset format for parameters 'start_time' and 'end_time' are Z(UTC), HH:MM, HHMM and HH.",
             "type": "investigative",
             "read_only": true,
             "parameters": {
@@ -374,7 +374,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "message"
+                        "Successfully fetched traffic flow list"
                     ]
                 },
                 {
@@ -423,7 +423,7 @@
                     ],
                     "order": 1,
                     "description": "Protocol",
-                    "default": "tcp",
+                    "default": "TCP",
                     "required": true
                 },
                 "name": {
@@ -583,12 +583,12 @@
             "identifier": "provision_objects",
             "description": "Provisions the specified objects",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "hrefs": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Object HREFs",
+                    "description": "Object HREFs (Comma-seperated values)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -625,7 +625,7 @@
                     "data_path": "action_result.data.*.commit_message",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom object provisioning."
+                        "Object provisioning"
                     ]
                 },
                 {
@@ -775,7 +775,7 @@
         {
             "action": "get ip lists",
             "identifier": "get_ip_lists",
-            "description": "Get ip list of specified name",
+            "description": "Get IP list of specified name",
             "type": "investigative",
             "read_only": true,
             "parameters": {
@@ -797,7 +797,12 @@
                 "ip_address": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "IP Address linked with IP List"
+                    "description": "IP Address linked with IP List",
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
                 }
             },
             "render": {
@@ -832,6 +837,10 @@
                     "data_type": "string",
                     "example_values": [
                         "10.6.4.226"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
@@ -899,7 +908,8 @@
                     "data_path": "action_result.data.*.ip_lists.*.ip_ranges.*.exclusion",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1019,7 +1029,8 @@
                     "data_path": "action_result.data.*.enabled",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1066,7 +1077,8 @@
                     "data_path": "action_result.data.*.rules.*.enabled",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1080,7 +1092,8 @@
                     "data_path": "action_result.data.*.rules.*.machine_auth",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1101,21 +1114,24 @@
                     "data_path": "action_result.data.*.rules.*.sec_connect",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.stateless",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.rules.*.unscoped_consumers",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1333,7 +1349,8 @@
                     "data_path": "action_result.data.*.enabled",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1358,7 +1375,8 @@
                     "data_path": "action_result.data.*.machine_auth",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1384,21 +1402,24 @@
                     "data_path": "action_result.data.*.sec_connect",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.stateless",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.unscoped_consumers",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1460,7 +1481,7 @@
                 "providers": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of hrefs",
+                    "description": "List of HREFs",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1472,7 +1493,7 @@
                 "consumers": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "List of hrefs",
+                    "description": "List of HREFs",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1699,7 +1720,12 @@
                 "public_ip_address": {
                     "data_type": "string",
                     "order": 4,
-                    "description": "Public IP Address"
+                    "description": "Public IP Address",
+                    "primary": true,
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
                 },
                 "description": {
                     "data_type": "string",
@@ -1714,7 +1740,7 @@
                 "os_id": {
                     "data_type": "string",
                     "order": 7,
-                    "description": "OS id"
+                    "description": "OS ID"
                 }
             },
             "render": {
@@ -1784,13 +1810,18 @@
                     "data_type": "string",
                     "example_values": [
                         "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.workloads.*.agent.config.log_traffic",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1843,7 +1874,8 @@
                     "data_path": "action_result.data.*.workloads.*.agent.status.fw_config_current",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1927,7 +1959,8 @@
                     "data_path": "action_result.data.*.workloads.*.agent.unpair_allowed",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1941,7 +1974,8 @@
                     "data_path": "action_result.data.*.workloads.*.containers_inherit_host_policy",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1976,7 +2010,8 @@
                     "data_path": "action_result.data.*.workloads.*.deleted",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1999,7 +2034,8 @@
                     "data_path": "action_result.data.*.workloads.*.firewall_coexistence.illumio_primary",
                     "data_type": "boolean",
                     "example_values": [
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -2053,7 +2089,8 @@
                     "data_path": "action_result.data.*.workloads.*.interfaces.*.loopback",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -2097,7 +2134,8 @@
                     "data_path": "action_result.data.*.workloads.*.online",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -2189,7 +2227,7 @@
             "identifier": "create_service_binding",
             "description": "Binds workload with virtual service",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "workload_hrefs": {
                     "data_type": "string",
@@ -2269,7 +2307,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully bound 1 workload with virtual service"
+                        "Successfully bound workload with virtual service"
                     ]
                 },
                 {
@@ -2294,12 +2332,12 @@
             "identifier": "update_enforcement_mode",
             "description": "Update enforcement mode of workloads",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "workload_hrefs": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of hrefs",
+                    "description": "List of HREFs",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -2309,7 +2347,7 @@
             },
             "render": {
                 "type": "table",
-                "title": "Service Binding"
+                "title": "Enforcement Mode"
             },
             "output": [
                 {
@@ -2349,7 +2387,9 @@
                 {
                     "data_path": "action_result.data.*.*.href",
                     "data_type": "string",
-                    "example_values": "/orgs/1/workloads/bd004cd5-f37c-4823-9ec9-cb1773dd11fc",
+                    "example_values": [
+                        "/orgs/1/workloads/bd004cd5-f37c-4823-9ec9-cb1773dd11fc"
+                    ],
                     "column_name": "HREF",
                     "column_order": 0,
                     "contains": [
@@ -2398,6 +2438,38 @@
             {
                 "module": "dateutil",
                 "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/shared/beautifulsoup4-4.11.1-py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/shared/requests-2.28.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/shared/certifi-2022.6.15-py3-none-any.whl"
+            },
+            {
+                "module": "charset_normalizer",
+                "input_file": "wheels/shared/charset_normalizer-2.1.1-py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/shared/idna-3.3-py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/shared/soupsieve-2.3.2-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     }

@@ -29,14 +29,14 @@ from phantom.action_result import ActionResult
 
 from illumio_consts import *
 import sys
+import ipaddress
 import requests
 import json
 import illumio
 from datetime import datetime
 from dateutil.parser import parse
 import pytz
-
-from illumio.exceptions import IllumioException
+from bs4 import UnicodeDammit
 
 
 class IllumioConnector(BaseConnector):
@@ -222,7 +222,7 @@ class IllumioConnector(BaseConnector):
             hrefs_list = self.handle_comma_seperated_string(hrefs)
 
             provisioned_virtual_service_obj = self._pce.provision_policy_changes(
-                change_description="Phantom object provisioning.",
+                change_description="Object provisioning.",
                 hrefs=hrefs_list,
             )
 
@@ -375,9 +375,7 @@ class IllumioConnector(BaseConnector):
         workload_hrefs_list = self.handle_comma_seperated_string(
             param["workload_hrefs"]
         )
-        virtual_service_href = illumio.convert_draft_href_to_active(
-            param["virtual_service_href"]
-        )
+        virtual_service_href = param["virtual_service_href"]
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
@@ -553,9 +551,9 @@ class IllumioConnector(BaseConnector):
                 [
                     {
                         "enforcement_mode": "selective",
-                        "href": wl,
+                        "href": workload,
                     }
-                    for wl in workload_hrefs_list
+                    for workload in workload_hrefs_list
                 ]
             )
 
@@ -633,7 +631,23 @@ class IllumioConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return self.get_status()
 
+        self.set_validator("ipv6", self._is_ip)
         return phantom.APP_SUCCESS
+
+    def _is_ip(self, input_ip_address):
+        """Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        ip_address_input = input_ip_address
+
+        try:
+            ipaddress.ip_address(UnicodeDammit(ip_address_input).unicode_markup)
+        except:
+            return False
+
+        return True
 
     def check_for_future_datetime(self, datetime_obj):
         """
@@ -701,7 +715,7 @@ class IllumioConnector(BaseConnector):
             self._pce.set_credentials(self._api_key, self._api_secret)
             test_connection = self._pce.check_connection()
 
-        except IllumioException as e:
+        except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Encountered error while conecting to PCE: {}".format(e),
@@ -750,11 +764,11 @@ class IllumioConnector(BaseConnector):
                 if min <= parameter <= max:
                     return phantom.APP_SUCCESS, parameter
                 else:
-                    error_message = "Invalid integer value for parameter {}: please enter value between {} and {}".format(
+                    error_message = "Invalid integer value for parameter {}. Please enter value between {} and {}".format(
                         key, min, max
                     )
             except Exception:
-                pass  # fall through to the default failure response
+                self.debug_print("Encountered error validating integer: {}".format(e))
         return action_result.set_status(phantom.APP_ERROR, error_message), None
 
     def finalize(self):
@@ -772,12 +786,21 @@ def main():
     argparser.add_argument("input_test_json", help="Input Test JSON file")
     argparser.add_argument("-u", "--username", help="username", required=False)
     argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument(
+        "-v",
+        "--verify",
+        action="store_true",
+        help="verify",
+        required=False,
+        default=False,
+    )
 
     args = argparser.parse_args()
     session_id = None
 
     username = args.username
     password = args.password
+    verify = args.verify
 
     if username is not None and password is None:
 
@@ -791,7 +814,7 @@ def main():
             login_url = IllumioConnector._get_phantom_base_url() + "/login"
 
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, verify=verify, timeout=DEFAULT_REQUEST_TIMEOUT)
             csrftoken = r.cookies["csrftoken"]
 
             data = dict()
@@ -804,11 +827,17 @@ def main():
             headers["Referer"] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(
+                login_url,
+                verify=verify,
+                data=data,
+                headers=headers,
+                timeout=DEFAULT_REQUEST_TIMEOUT,
+            )
             session_id = r2.cookies["sessionid"]
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -825,7 +854,7 @@ def main():
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
