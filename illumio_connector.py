@@ -478,7 +478,7 @@ class IllumioConnector(BaseConnector):
     def _handle_get_workloads(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        enforcement_mode = param.get("enforcement_mode")
+        enforcement_mode = param.get("enforcement_mode").lower()
         connectivity = param.get("connectivity")
         labels = self.handle_comma_seperated_string(param.get("labels", ""))
 

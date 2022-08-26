@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Illumio",
     "license": "Copyright (c) Illumio, 2022",
-    "app_version": "1.0.1",
+    "app_version": "1.0.0",
     "utctime_updated": "2022-07-19T07:24:45.112655Z",
     "package_name": "phantom_illumio",
     "main_module": "illumio_connector.py",
