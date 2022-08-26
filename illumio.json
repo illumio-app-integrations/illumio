@@ -18,7 +18,7 @@
     "min_phantom_version": "5.3.0",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
-        "Illumio 21.2, Cloud, 2nd August 2022"
+        "Illumio 21.2, Cloud, 29th August 2022"
     ],
     "configuration": {
         "hostname": {
@@ -86,7 +86,7 @@
                 "port": {
                     "data_type": "numeric",
                     "order": 2,
-                    "description": "Port number (Valid port range is 1-65535)",
+                    "description": "Port number (Maximum port value is 65535)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -882,7 +882,7 @@
                     "example_values": [
                         "/orgs/1/sec_policy/draft/ip_lists/1"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 1,
                     "contains": [
                         "illumio ip list href"
@@ -1028,7 +1028,7 @@
                     "example_values": [
                         "/orgs/1/sec_policy/draft/rule_sets/1611"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 0,
                     "contains": [
                         "illumio ruleset href"
@@ -1342,7 +1342,7 @@
                     "example_values": [
                         "/orgs/1/sec_policy/draft/rule_sets/11110/sec_rules/18665"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 2,
                     "contains": [
                         "illumio ruleset href"
@@ -1490,7 +1490,7 @@
                 "port": {
                     "data_type": "numeric",
                     "order": 2,
-                    "description": "Port number (Valid port range is 1-65535)",
+                    "description": "Port number (Maximum port value is 65535)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1588,7 +1588,7 @@
                     "example_values": [
                         "/orgs/1/sec_policy/active/enforcement_boundaries/1019"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 1,
                     "contains": [
                         "illumio enforcement boundary href"
@@ -2015,7 +2015,7 @@
                     "example_values": [
                         "/orgs/1/workloads/bb558b7b-bd43-41f1-bdd9-e576728ca81b"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 0,
                     "contains": [
                         "illumio workload href"
@@ -2258,7 +2258,7 @@
                     "example_values": [
                         "/orgs/1/service_bindings/bffce2c8-d54c-4d43-8f0b-75e1af3d3b84"
                     ],
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 0
                 },
                 {
@@ -2350,7 +2350,7 @@
                     "data_path": "action_result.data.*.*.href",
                     "data_type": "string",
                     "example_values": "/orgs/1/workloads/bd004cd5-f37c-4823-9ec9-cb1773dd11fc",
-                    "column_name": "Href",
+                    "column_name": "HREF",
                     "column_order": 0,
                     "contains": [
                         "illumio workload href"
@@ -2389,7 +2389,7 @@
         "wheel": [
             {
                 "module": "illumio",
-                "input_file": "wheels/shared/illumio-1.0.4-py3-none-any.whl"
+                "input_file": "wheels/shared/illumio-1.1.0-py3-none-any.whl"
             },
             {
                 "module": "pytz",

@@ -40,7 +40,7 @@
         </tr>
         <tr>
             <td>illumio</td>
-            <td>1.0.3</td>
+            <td>1.1.0</td>
         </tr>
     </table>
     </p>
@@ -49,7 +49,7 @@
     <p>
         Follow these steps to create an asset for the app in Phantom Platform:
     <ul>
-        <li>Log in to the Illumio platform.</li>
+        <li>Log in to the Illumio Policy Compute Engine.</li>
         <ul>
             <li>Once logged in, user's name is shown on top-right corner with dropdown where you find <b>My API Keys</b>
                 option.</li>
@@ -87,7 +87,7 @@
     parameters related to test connectivity action are Illumio API Key, API Secret, Hostname, Port and Org ID.
     <ul>
         <li>
-            <b>API Key: </b> Illumio Authentication Username for asset authorization.
+            <b>API Key: </b> The API Key Username for the key created in the previous steps.
         </li>
         <li>
             <b>API Secret</A>: </b> API Secret for asset authorization.
@@ -124,12 +124,12 @@
                 <li><b>Action Parameter: Start Time</b></li>
                 <ul>
                     <li>This parameter will accept the start datetime for a traffic. An error message will be
-                        shown if the datetime is invalid.</li>
+                        shown if the datetime is invalid. Start time support human readable or ISO datetime values.</li>
                 </ul>
                 <li><b>Action Parameter: End Time</b></li>
                 <ul>
                     <li>This parameter will accept the end datetime for a traffic. An error message will be
-                        shown if the datetime is invalid.</li>
+                        shown if the datetime is invalid. End time support human readable or ISO datetime values.</li>
                 </ul>
                 <li><b>Action Parameter: Port</b></li>
                 <ul>
@@ -155,7 +155,7 @@
                                 <li>End Time = "2022-07-10T17:45:08"</li>
                                 <li>Port = 22</li>
                                 <li>Protocol = "TCP"</li>
-                                <li>Policy Decisions = "potentially_blocked</li>
+                                <li>Policy Decisions = "potentially_blocked"</li>
                             </ul>
                         </li>
                     </ul>
@@ -196,8 +196,9 @@
         <li>
             <h3>Create Service Binding</h3>
             <p>
-                Binds one or more workloads to active service. The virtual service must be created in the draft and then
-                provisioned for the call to work.
+                Binds one or more workloads to virtual service. The virtual service must be provisioned into active
+                state
+                to bind a workload to it.
             </p>
 
             <ul>
@@ -315,13 +316,16 @@
                 <li><b>Examples:</b>
                     <ul>
                         <li>Create new rule with provider as
-                            "/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4", consumer as
+                            "/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4", consumer
+                            as
                             "/orgs/1/sec_policy/active/ip_lists/958", ruleset as
-                            "/orgs/1/sec_policy/draft/rule_sets/1611", resolve_consumers_as "workloads", resolve_providers_as "virtual_services"
+                            "/orgs/1/sec_policy/draft/rule_sets/1611", resolve_consumers_as "workloads",
+                            resolve_providers_as "virtual_services"
                         </li>
                         <ul>
                             <li>consumer="/orgs/1/sec_policy/active/ip_lists/958"</li>
-                            <li>provider="/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"</li>
+                            <li>provider="/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"
+                            </li>
                             <li>ruleset_href="/orgs/1/sec_policy/draft/rule_sets/1611"</li>
                             <li>resolve_providers_as="virtual_services"</li>
                             <li>resolve_consumers_as="workloads"</li>
@@ -364,7 +368,7 @@
                         </li>
                         <ul>
                             <li>consumer="/orgs/1/sec_policy/active/ip_lists/958"</li>
-                            <li>provider="ams"</li>
+                            <li>provider="ams" (NOTE: where "ams" represents all workloads)</li>
                             <li>name="test-eb"</li>
                             <li>port=22</li>
                             <li>protocol="TCP"</li>
@@ -402,15 +406,17 @@
                 </ul>
                 <li><b>Examples:</b>
                     <ul>
-                        <li>Provision virtual service "/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"
+                        <li>Provision virtual service
+                            "/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"
                         </li>
                         <ul>
-                            <li>hrefs="/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"</li>
+                            <li>hrefs="/orgs/1/sec_policy/draft/virtual_services/ce3387fd-703a-4068-a3d2-6e71d63068f4"
+                            </li>
                         </ul>
                     </ul>
                 </li>
             </ul>
-        </li> 
+        </li>
         <li>
             <h3>Get Workloads</h3>
             Gets multiple workloads based on the given search criteria.
@@ -449,20 +455,22 @@
                 </ul>
                 <li><b>Examples:</b>
                     <ul>
-                        <li>Fetch list of workload with name as "test", enforcement_mode "visibility_only", connectivity "online", labels "/orgs/1/labels/27380", ip_address "1.1.1.1", description "test workload", hostname "Perf_test 16608" and os_id "ubuntu-x86_64-xenial"</li>
+                        <li>Fetch list of workload with name as "test", enforcement_mode "visibility_only", connectivity
+                            "online", labels "/orgs/1/labels/27380", ip_address "1.1.1.1", description "test workload",
+                            hostname "Perf_test 16608" and os_id "ubuntu-x86_64-xenial"</li>
                         <ul>
-                            <li>enforcement_mode="visibility_only</li>
+                            <li>enforcement_mode="visibility_only"</li>
                             <li>connectivity="online</li>
                             <li>name="test"</li>
                             <li>labels="/orgs/1/labels/27380"</li>
                             <li>ip_address="1.1.1.1"</li>
                             <li>description="test workload"</li>
-                            <li>hostname="Perf_test 16608"</li>
+                            <li>hostname="centos7"</li>
                             <li>os_id="ubuntu-x86_64-xenial"</li>
                         </ul>
                     </ul>
                 </li>
             </ul>
-        </li>        
+        </li>
     </ul>
     </li>

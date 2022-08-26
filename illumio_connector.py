@@ -185,7 +185,7 @@ class IllumioConnector(BaseConnector):
             )
 
         except Exception as e:
-            if ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG in e.args[0]:
+            if ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG in str(e):
                 service_list = self._pce.virtual_services.get(
                     params={"name": service_name}
                 )
@@ -300,7 +300,7 @@ class IllumioConnector(BaseConnector):
                 phantom.APP_SUCCESS, "Successfully created ruleset"
             )
         except Exception as e:
-            if ILLUMIO_EXISTING_OBJECT_MSG in e.args[0]:
+            if ILLUMIO_EXISTING_OBJECT_MSG in str(e):
                 ruleset_list = self._pce.rule_sets.get(params={"name": name})
                 for ruleset in ruleset_list:
                     if name == ruleset.name:
@@ -451,7 +451,7 @@ class IllumioConnector(BaseConnector):
                 phantom.APP_SUCCESS, "Successfully created enforcement boundary"
             )
         except Exception as e:
-            if ILLUMIO_EXISTING_OBJECT_MSG in e.args[0]:
+            if ILLUMIO_EXISTING_OBJECT_MSG in str(e):
                 enforcement_boundary_list = self._pce.enforcement_boundaries.get(
                     params={"name": name}
                 )
@@ -478,24 +478,17 @@ class IllumioConnector(BaseConnector):
     def _handle_get_workloads(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        enforcement_mode = (
-            param.get("enforcement_mode").lower()
-            if param.get("enforcement_mode")
-            else None
-        )
-        connectivity = (
-            param.get("connectivity").lower() if param.get("connectivity") else None
-        )
+        enforcement_mode = param.get("enforcement_mode")
+        connectivity = param.get("connectivity")
         labels = self.handle_comma_seperated_string(param.get("labels", ""))
-        managed = True
 
-        if enforcement_mode not in ENFORCEMENT_MODE_LIST:
+        if enforcement_mode and enforcement_mode not in ENFORCEMENT_MODE_LIST:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Please enter a valid value for 'enforcement_mode' parameter",
             )
 
-        if connectivity not in CONNECTIVITY_LIST:
+        if connectivity and connectivity not in CONNECTIVITY_LIST:
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Please enter a valid value for 'connectivity' parameter",
@@ -505,8 +498,7 @@ class IllumioConnector(BaseConnector):
             connectivity = True
         elif connectivity == "offline":
             connectivity = False
-        elif connectivity == "unmanaged":
-            managed = False
+        else:
             connectivity = None
 
         ret_val = self.connect_pce(action_result)
@@ -517,7 +509,7 @@ class IllumioConnector(BaseConnector):
             workloads_list = self._pce.workloads.get(
                 policy_version="active",
                 params={
-                    "managed": managed,
+                    "managed": False if connectivity == "unmanaged" else None,
                     "enforcement_mode": enforcement_mode,
                     "online": connectivity,
                     "name": param.get("name"),
