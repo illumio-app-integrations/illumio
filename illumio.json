@@ -1214,7 +1214,7 @@
                 "providers": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of HREFS",
+                    "description": "List of HREFS (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1226,7 +1226,7 @@
                 "consumers": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "List of HREFS",
+                    "description": "List of HREFS (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1481,7 +1481,7 @@
                 "providers": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of HREFs",
+                    "description": "List of HREFs (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1493,7 +1493,7 @@
                 "consumers": {
                     "data_type": "string",
                     "order": 1,
-                    "description": "List of HREFs",
+                    "description": "List of HREFs (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -1715,7 +1715,7 @@
                 "labels": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "Labels"
+                    "description": "Label HREFs (Comma-seperated values are allowed)"
                 },
                 "public_ip_address": {
                     "data_type": "string",
@@ -2232,7 +2232,7 @@
                 "workload_hrefs": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of workload HREFS",
+                    "description": "List of workload HREFS (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -2337,7 +2337,7 @@
                 "workload_hrefs": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "List of HREFs",
+                    "description": "List of HREFs (Comma-seperated values are allowed)",
                     "required": true,
                     "primary": true,
                     "contains": [
