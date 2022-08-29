@@ -1697,29 +1697,37 @@
                     "order": 0,
                     "description": "Enforcement mode"
                 },
-                "connectivity": {
+                "online": {
                     "data_type": "string",
                     "value_list": [
-                        "ONLINE",
-                        "OFFLINE",
-                        "UNMANAGED"
+                        "True",
+                        "False"
                     ],
                     "order": 1,
-                    "description": "Connectivity"
+                    "description": "Online"
+                },
+                "managed": {
+                    "data_type": "string",
+                    "value_list": [
+                        "True",
+                        "False"
+                    ],
+                    "order": 2,
+                    "description": "Managed"
                 },
                 "name": {
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "description": "Workload Name"
                 },
                 "labels": {
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "description": "Label HREFs (Comma-seperated values are allowed)"
                 },
                 "public_ip_address": {
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "description": "Public IP Address",
                     "primary": true,
                     "contains": [
@@ -1729,17 +1737,17 @@
                 },
                 "description": {
                     "data_type": "string",
-                    "order": 5,
+                    "order": 6,
                     "description": "Workload Description"
                 },
                 "hostname": {
                     "data_type": "string",
-                    "order": 6,
+                    "order": 7,
                     "description": "Hostname"
                 },
                 "os_id": {
                     "data_type": "string",
-                    "order": 7,
+                    "order": 8,
                     "description": "OS ID"
                 }
             },
@@ -1754,13 +1762,6 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.connectivity",
-                    "data_type": "string",
-                    "example_values": [
-                        "online"
                     ]
                 },
                 {
@@ -1792,10 +1793,26 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.managed",
+                    "data_type": "string",
+                    "example_values": [
+                        "True",
+                        "False"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string",
                     "example_values": [
                         "test-vs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.online",
+                    "data_type": "string",
+                    "example_values": [
+                        "True",
+                        "False"
                     ]
                 },
                 {

@@ -22,7 +22,7 @@
 
 PROTOCOL_LIST = ["tcp", "udp"]
 ENFORCEMENT_MODE_LIST = ["idle", "visibility_only", "full", "selective"]
-CONNECTIVITY_LIST = ["online", "offline", "unmanaged"]
+BOOLEAN_LIST = ["True", "False"]
 PORT_MAX_VALUE = 65535
 ILLUMIO_INVALID_PROTOCOL_MSG = "Please enter a valid value for 'protocol' parameter"
 ILLUMIO_EXISTING_OBJECT_MSG = "already in use"

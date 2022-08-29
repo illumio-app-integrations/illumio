@@ -476,28 +476,31 @@ class IllumioConnector(BaseConnector):
     def _handle_get_workloads(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        enforcement_mode = param.get("enforcement_mode").lower()
-        connectivity = param.get("connectivity")
+        enforcement_mode = param.get("enforcement_mode")
+        if enforcement_mode:
+            enforcement_mode = enforcement_mode.lower()
+            if enforcement_mode not in ENFORCEMENT_MODE_LIST:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Please enter a valid value for 'enforcement_mode' parameter",
+                )
+        online = param.get("online")
+        if online:
+            online = online == "True"
+            if str(online) not in BOOLEAN_LIST:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Please enter a valid value for 'online' parameter",
+                )
+        managed = param.get("managed")
+        if managed:
+            managed = managed == "True"
+            if str(managed) not in BOOLEAN_LIST:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Please enter a valid value for 'managed' parameter",
+                )
         labels = self.handle_comma_seperated_string(param.get("labels", ""))
-
-        if enforcement_mode and enforcement_mode not in ENFORCEMENT_MODE_LIST:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Please enter a valid value for 'enforcement_mode' parameter",
-            )
-
-        if connectivity and connectivity not in CONNECTIVITY_LIST:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Please enter a valid value for 'connectivity' parameter",
-            )
-
-        if connectivity == "online":
-            connectivity = True
-        elif connectivity == "offline":
-            connectivity = False
-        else:
-            connectivity = None
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
@@ -507,9 +510,9 @@ class IllumioConnector(BaseConnector):
             workloads_list = self._pce.workloads.get(
                 policy_version="active",
                 params={
-                    "managed": False if connectivity == "unmanaged" else None,
+                    "managed": managed,
                     "enforcement_mode": enforcement_mode,
-                    "online": connectivity,
+                    "online": online,
                     "name": param.get("name"),
                     "labels": [labels],
                     "ip_address": param.get("public_ip_address"),
