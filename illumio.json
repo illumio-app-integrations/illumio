@@ -2457,10 +2457,6 @@
                 "input_file": "wheels/shared/python_dateutil-2.8.2-py2.py3-none-any.whl"
             },
             {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/shared/beautifulsoup4-4.11.1-py3-none-any.whl"
-            },
-            {
                 "module": "requests",
                 "input_file": "wheels/shared/requests-2.28.1-py3-none-any.whl"
             },
@@ -2479,10 +2475,6 @@
             {
                 "module": "six",
                 "input_file": "wheels/shared/six-1.16.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/shared/soupsieve-2.3.2-py3-none-any.whl"
             },
             {
                 "module": "urllib3",

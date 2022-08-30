@@ -36,7 +36,6 @@ import illumio
 from datetime import datetime
 from dateutil.parser import parse
 import pytz
-from bs4 import UnicodeDammit
 
 
 class IllumioConnector(BaseConnector):
@@ -638,15 +637,13 @@ class IllumioConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _is_ip(self, input_ip_address):
-        """Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+        """Check given address and return True if address is valid IPv4 or IPV6 address.
+
         :param input_ip_address: IP address
         :return: status (success/failure)
         """
-
-        ip_address_input = input_ip_address
-
         try:
-            ipaddress.ip_address(UnicodeDammit(ip_address_input).unicode_markup)
+            ipaddress.ip_address(input_ip_address)
         except:
             return False
 
