@@ -513,7 +513,7 @@ class IllumioConnector(BaseConnector):
                     "enforcement_mode": enforcement_mode,
                     "online": online,
                     "name": param.get("name"),
-                    "labels": [labels],
+                    "labels": "[{}]".format(str(labels).replace("'", '"')),
                     "ip_address": param.get("public_ip_address"),
                     "description": param.get("description"),
                     "hostname": param.get("hostname"),
