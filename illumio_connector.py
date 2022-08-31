@@ -399,9 +399,12 @@ class IllumioConnector(BaseConnector):
             )
 
         except Exception as e:
+            err_msg = "Encountered error creating service binding: {}".format(e)
+            if ILLUMIO_INVALID_VIRTUAL_SERVICE_HREF in str(e):
+                err_msg = "Invalid virtual service HREF or HREF needs to be provisioned"
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Encountered error creating service binding: {}".format(e),
+                err_msg,
             )
 
         service_bindings["service_bindings"] = [

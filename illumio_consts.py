@@ -27,4 +27,5 @@ PORT_MAX_VALUE = 65535
 ILLUMIO_INVALID_PROTOCOL_MSG = "Please enter a valid value for 'protocol' parameter"
 ILLUMIO_EXISTING_OBJECT_MSG = "already in use"
 ILLUMIO_EXISTING_VIRTUAL_SERVICE_MSG = "Name must be unique"
+ILLUMIO_INVALID_VIRTUAL_SERVICE_HREF = "Invalid URI"
 DEFAULT_REQUEST_TIMEOUT = 30  # in seconds
