@@ -374,7 +374,9 @@ class IllumioConnector(BaseConnector):
         workload_hrefs_list = self.handle_comma_seperated_string(
             param["workload_hrefs"]
         )
-        virtual_service_href = param["virtual_service_href"]
+        virtual_service_href = illumio.convert_draft_href_to_active(
+            param["virtual_service_href"]
+        )
 
         ret_val = self.connect_pce(action_result)
         if phantom.is_fail(ret_val):
