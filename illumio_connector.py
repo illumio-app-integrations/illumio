@@ -381,7 +381,7 @@ class IllumioConnector(BaseConnector):
                 "Encountered error creating rule: {}".format(e),
             )
 
-        result = self.convert_object_to_json(rule, action_result)
+        result = self.convert_object_to_json(rule_data, action_result)
         action_result.add_data(result)
         return action_result.get_status()
 
