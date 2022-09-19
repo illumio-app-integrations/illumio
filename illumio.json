@@ -1260,6 +1260,11 @@
                     "order": 4,
                     "description": "Providers",
                     "required": true
+                },
+                "ingress_services": {
+                    "data_type": "string",
+                    "order": 5,
+                    "description": "Ingress services"
                 }
             },
             "render": {
@@ -1285,6 +1290,13 @@
                         "illumio virtual service href",
                         "illumio ip list href",
                         "illumio workload href"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ingress_services",
+                    "data_type": "string",
+                    "example_values": [
+                        "/orgs/1/sec_policy/draft/services/1755"
                     ]
                 },
                 {
