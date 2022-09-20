@@ -1252,19 +1252,19 @@
                 "resolve_consumers_as": {
                     "data_type": "string",
                     "order": 3,
-                    "description": "Consumers",
+                    "description": "Consumers (Comma-seperated values are allowed)",
                     "required": true
                 },
                 "resolve_providers_as": {
                     "data_type": "string",
                     "order": 4,
-                    "description": "Providers",
+                    "description": "Providers (Comma-seperated values are allowed)",
                     "required": true
                 },
                 "ingress_services": {
                     "data_type": "string",
                     "order": 5,
-                    "description": "Ingress services"
+                    "description": "Ingress services (Comma-seperated values are allowed)"
                 }
             },
             "render": {
